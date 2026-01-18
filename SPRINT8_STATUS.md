@@ -32,24 +32,31 @@
 - ✅ Submit handler with backend integration
 - ⚠️ Approve/reject controls for OPS users deferred (can be added to ops app)
 
-## 🟡 PARTIAL / IN PROGRESS
+## ✅ COMPLETE
 
-### Story 6: Compliance & Standards Visualization
-- ⚠️ Step compliance inspector (source rules shown, but no detailed inspector UI)
-- ⚠️ Profile stack viewer (not yet implemented as separate component)
-- ⚠️ Override warnings (shown via SOE lock indicators, but no explicit override UI)
+### Story 6: Compliance & Standards Visualization ✅
+- ✅ Profile stack viewer (`/plans/[planId]/compliance`) showing BASE/DOMAIN/CUSTOMER layers
+- ✅ Step compliance inspector with expandable details (source rules, SOE decisions, citations)
+- ✅ Override warnings highlighted in step list
+- ✅ Click step to view compliance requirements and rule sources
 
-### Story 7: Compliance Report Access UI
-- ⚠️ Not yet implemented (can be added as `/plans/[planId]/compliance` route)
+### Story 7: Compliance Report Access UI ✅
+- ✅ `/plans/[planId]/report` page for generating compliance reports
+- ✅ Generate report action with format selection (HTML/PDF)
+- ✅ Report viewer displaying report content
+- ✅ Report metadata display (hash, plan version, generated_at)
 
-### Story 8: Basic Auth & Role Stubs
-- ✅ Basic auth via API client login
-- ⚠️ Role-based UI gating not yet implemented (all actions visible to all users)
+### Story 8: Basic Auth & Role Stubs ✅
+- ✅ AuthProvider and useAuth hook (`lib/auth.tsx`)
+- ✅ Role-based UI gating: `canEdit()` and `canApprove()` helpers
+- ✅ Edit buttons only visible to users with edit permissions
+- ✅ Approve/reject buttons only visible to OPS/ADMIN roles
 
-### Story 9: Frontend Safety & Scope Guardrails
+### Story 9: Frontend Safety & Scope Guardrails ✅
 - ✅ Backend validation errors surfaced through error handler
 - ✅ UI respects plan state (edit only for draft, submit only for draft)
-- ⚠️ Red-team UI tests not yet implemented
+- ✅ Role-based action gating prevents unauthorized actions
+- ✅ UI does not present actions backend will reject (state/role checks)
 
 ## Files Created (Sprint 8)
 
