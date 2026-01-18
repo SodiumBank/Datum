@@ -116,7 +116,7 @@ def list_plans_endpoint(
 
 
 class UpdatePlanStepsRequest(BaseModel):
-    """Request model for updating plan steps."""
+    """Request model for updating plan steps (Sprint 2: NOT ALLOWED)."""
     steps: list[dict]
     override_reason: str | None = None
 
@@ -128,10 +128,19 @@ def update_plan_steps(
     auth: dict = Depends(require_role("OPS", "ADMIN")),
 ):
     """
-    Update plan steps with validation for locked sequences.
+    Update plan steps (Sprint 2: NOT ALLOWED - Plans are immutable).
     
-    Locked steps cannot be reordered without an override reason and audit event.
+    SPRINT 2 GUARDRAIL: DatumPlan is read-only intent layer.
+    No edits, no overrides, no mutations.
+    This endpoint returns 403 in Sprint 2.
     """
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=(
+            "Sprint 2: DatumPlan is immutable. "
+            "Mutations are not allowed. Create a new revision in Sprint 3+."
+        ),
+    )
     plan = get_plan(plan_id)
     if not plan:
         raise HTTPException(
