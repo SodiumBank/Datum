@@ -107,9 +107,9 @@ def get_plan_compliance_trace(plan_id: str) -> Dict[str, Any]:
         if active_profiles:
             resolved_profiles, errors = resolve_profile_stack(active_profiles)
             if not errors:
-            # Use semantic layers (0=BASE, 1=DOMAIN, 2=CUSTOMER_OVERRIDE) not index
-            TYPE_LAYER = {"BASE": 0, "DOMAIN": 1, "CUSTOMER_OVERRIDE": 2}
-            profile_stack = [
+                # Use semantic layers (0=BASE, 1=DOMAIN, 2=CUSTOMER_OVERRIDE) not index
+                TYPE_LAYER = {"BASE": 0, "DOMAIN": 1, "CUSTOMER_OVERRIDE": 2}
+                profile_stack = [
                 {
                     "profile_id": p["profile_id"],
                     "profile_type": p["profile_type"],
