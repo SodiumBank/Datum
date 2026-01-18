@@ -300,8 +300,8 @@ def build_compliance_report_data(plan_id: str) -> Dict[str, Any]:
         raise ValueError(f"Plan not found: {plan_id}")
     
     # Verify plan is approved (reports only from approved plans)
-    if plan.get("status") != "approved":
-        raise ValueError(f"Plan must be approved to generate compliance report. Current status: {plan.get('status')}")
+    if plan.get("state") != "approved":
+        raise ValueError(f"Plan must be approved to generate compliance report. Current status: {plan.get('state')}")
     
     compliance_trace = get_plan_compliance_trace(plan_id)
     

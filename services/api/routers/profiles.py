@@ -15,6 +15,17 @@ from services.api.core.profile_lifecycle import (
     validate_profile_for_use,
 )
 from services.api.core.profile_stack import load_profile
+from services.api.core.profile_versioning import (
+    create_profile_version,
+    load_profile_version,
+    list_profile_versions,
+    compare_profile_versions,
+)
+from services.api.core.profile_bundles import (
+    save_profile_bundle,
+    load_profile_bundle,
+    list_profile_bundles,
+)
 
 router = APIRouter()
 
@@ -201,4 +212,139 @@ def validate_profile_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to validate profile: {str(e)}",
+        ) from e
+
+
+@router.get("/profiles/{profile_id}/versions")
+def list_profile_versions_endpoint(
+    profile_id: str,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """List all versions of a profile."""
+    try:
+        versions = list_profile_versions(profile_id)
+        return {
+            "profile_id": profile_id,
+            "versions": versions,
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to list profile versions: {str(e)}",
+        ) from e
+
+
+@router.get("/profiles/{profile_id}/versions/{version}")
+def get_profile_version_endpoint(
+    profile_id: str,
+    version: str,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """Get a specific version of a profile."""
+    try:
+        profile = load_profile_version(profile_id, version)
+        return {
+            "profile_id": profile_id,
+            "version": version,
+            "profile": profile,
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get profile version: {str(e)}",
+        ) from e
+
+
+@router.get("/profiles/{profile_id}/versions/{version1}/compare/{version2}")
+def compare_profile_versions_endpoint(
+    profile_id: str,
+    version1: str,
+    version2: str,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """Compare two profile versions."""
+    try:
+        diff = compare_profile_versions(profile_id, version1, version2)
+        return diff
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to compare profile versions: {str(e)}",
+        ) from e
+
+
+@router.get("/bundles")
+def list_bundles_endpoint(
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """List all profile bundles."""
+    try:
+        bundles = list_profile_bundles()
+        return {
+            "bundles": bundles,
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to list bundles: {str(e)}",
+        ) from e
+
+
+@router.get("/bundles/{bundle_id}")
+def get_bundle_endpoint(
+    bundle_id: str,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """Get a profile bundle."""
+    try:
+        bundle = load_profile_bundle(bundle_id)
+        return bundle
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get bundle: {str(e)}",
+        ) from e
+
+
+@router.post("/bundles")
+def create_bundle_endpoint(
+    bundle: Dict[str, Any],
+    auth: dict = Depends(require_role("OPS", "ADMIN")),
+):
+    """Create a profile bundle."""
+    try:
+        save_profile_bundle(bundle)
+        return {
+            "bundle_id": bundle.get("bundle_id"),
+            "status": "created",
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create bundle: {str(e)}",
         ) from e
