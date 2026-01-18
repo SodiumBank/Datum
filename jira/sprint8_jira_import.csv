@@ -1,0 +1,45 @@
+Issue Type,Summary,Description,Priority,Component,Epic Name
+Epic,Sprint 8 – Frontend & Practical Workflows,"Introduce a human-facing UI and practical workflows for SOE, plans, compliance, and approvals without expanding execution scope.",Highest,Program,EPIC-8
+
+Story,Frontend Skeleton & App Shell,"Create a basic frontend application (Next.js or similar) with routing, layout, and API client setup.",Highest,Frontend,EPIC-8
+Sub-task,Create frontend project,"Initialize frontend app with routing, basic layout, and environment config.",Highest,Frontend,EPIC-8
+Sub-task,API client abstraction,"Create typed API client for Datum backend endpoints.",High,Frontend,EPIC-8
+Sub-task,Global error handling,"Add toast or banner error handling for API failures.",Medium,Frontend,EPIC-8
+
+Story,SOE Run UI,"Allow users to run SOE evaluations from the UI.",Highest,Frontend / SOE,EPIC-8
+Sub-task,SOE input form,"Form for industry, hardware class, inputs, and profile/bundle selection.",Highest,Frontend,EPIC-8
+Sub-task,SOE results viewer,"Display SOE decisions, active packs, and profile stack used.",High,Frontend,EPIC-8
+Sub-task,SOE determinism guard,"Warn if identical inputs would regenerate an identical SOE run.",Medium,Frontend,EPIC-8
+
+Story,Plan Generation & Viewing UI,"Generate and view Datum plans from SOE runs.",Highest,Frontend / Plans,EPIC-8
+Sub-task,Plan list view,"List plans with state, version, approval status.",High,Frontend,EPIC-8
+Sub-task,Plan detail page,"View steps, sequence, locked fields, and source rules.",Highest,Frontend,EPIC-8
+Sub-task,SOE-lock visualization,"Visually mark SOE-locked steps vs editable steps.",High,Frontend,EPIC-8
+
+Story,Governed Plan Editing UI,"Enable safe, governed plan edits from the UI.",Highest,Frontend / Governance,EPIC-8
+Sub-task,Editable step fields,"Allow editing only permitted fields on unlocked steps.",Highest,Frontend,EPIC-8
+Sub-task,Edit diff preview,"Show before/after diff prior to saving changes.",High,Frontend,EPIC-8
+Sub-task,Edit validation feedback,"Surface backend validation errors clearly.",High,Frontend,EPIC-8
+
+Story,Plan Approval Workflow UI,"Support submit/approve/reject flows in the UI.",Highest,Frontend / Workflow,EPIC-8
+Sub-task,Submit for approval action,"Allow plan submission with comments.",High,Frontend,EPIC-8
+Sub-task,Approval controls,"Approve/reject UI with justification input.",High,Frontend,EPIC-8
+Sub-task,Approval history timeline,"Display approval events and users.",Medium,Frontend,EPIC-8
+
+Story,Compliance & Standards Visualization,"Expose compliance trace and standards stack visually.",High,Frontend / Compliance,EPIC-8
+Sub-task,Profile stack viewer,"Display BASE/DOMAIN/CUSTOMER profiles and order.",High,Frontend,EPIC-8
+Sub-task,Step compliance inspector,"Click a step to see required clauses and sources.",High,Frontend,EPIC-8
+Sub-task,Override warnings,"Highlight steps with overrides or deviations.",Medium,Frontend,EPIC-8
+
+Story,Compliance Report Access UI,"Allow users to generate and view compliance reports.",Medium,Frontend / Reports,EPIC-8
+Sub-task,Generate report action,"Trigger compliance report generation from UI.",Medium,Frontend,EPIC-8
+Sub-task,Report viewer,"Display HTML compliance report inside the UI.",Medium,Frontend,EPIC-8
+Sub-task,Report metadata display,"Show report hash, plan version, profile stack.",Low,Frontend,EPIC-8
+
+Story,Basic Auth & Role Stubs,"Add minimal auth scaffolding to distinguish roles (viewer/editor/approver).",Medium,Frontend / API,EPIC-8
+Sub-task,Role stub model,"Hardcoded or mock roles for now (no real auth provider).",Medium,Frontend,EPIC-8
+Sub-task,Role-based UI gating,"Hide/show actions based on role.",Medium,Frontend,EPIC-8
+
+Story,Frontend Safety & Scope Guardrails,"Ensure frontend cannot bypass backend governance.",Highest,Compliance / Frontend,EPIC-8
+Sub-task,Disable forbidden actions,"UI must not present actions backend will reject.",High,Frontend,EPIC-8
+Sub-task,Add red-team UI tests,"Ensure UI cannot submit illegal edits or approvals.",Medium,QA,EPIC-8
