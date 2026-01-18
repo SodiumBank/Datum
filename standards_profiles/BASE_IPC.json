@@ -1,0 +1,32 @@
+{
+  "profile_id": "BASE_IPC",
+  "profile_type": "BASE",
+  "name": "IPC Base Manufacturing Standards",
+  "version": "1.0.0",
+  "parent_profiles": [],
+  "industry_domains": ["space", "aerospace", "medical", "automotive", "industrial"],
+  "source_standards": [
+    {
+      "standard_id": "IPC-A-610",
+      "clause": "General",
+      "section": "Acceptability of Electronic Assemblies"
+    },
+    {
+      "standard_id": "IPC-J-STD-001",
+      "clause": "General",
+      "section": "Requirements for Soldered Electrical and Electronic Assemblies"
+    }
+  ],
+  "standards_packs": [
+    "IPC_WORKMANSHIP_BASE"
+  ],
+  "inheritance_rules": {
+    "override_mode": "STRICT",
+    "conflict_resolution": "ERROR"
+  },
+  "metadata": {
+    "description": "Base IPC standards applicable to all manufacturing",
+    "effective_date": "2026-01-01",
+    "maintained_by": "Datum Engineering"
+  }
+}

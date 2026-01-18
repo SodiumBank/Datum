@@ -1,0 +1,33 @@
+Issue Type,Summary,Description,Priority,Component,Epic Name
+Epic,Sprint 4 – Standards Profile Stack & Audit-Ready Compliance,Introduce multi-industry standards layering and auditor-grade reporting on top of governed plans.,Highest,Program,EPIC-4
+Story,Standards Profile Stack Model,Implement a layered standards/compliance profile system to support aerospace medical automotive and customer-specific deltas.,Highest,Core / Compliance,EPIC-4
+Sub-task,Define profile hierarchy,Define Base Profile Domain Profile and Customer Override Profile structure.,Highest,Core / Compliance,EPIC-4
+Sub-task,Profile schema definition,Create schema for standards profiles including source standard and clause references.,High,Core / Compliance,EPIC-4
+Sub-task,Profile inheritance logic,Implement deterministic inheritance and override resolution between profile layers.,High,Core Logic,EPIC-4
+Sub-task,Profile validation tests,Ensure conflicting or circular profile rules are rejected.,High,QA,EPIC-4
+Story,SOE Pack Selection by Profile,Allow SOE runs to select active standards profiles and track their influence on plan generation.,Highest,SOE / Core,EPIC-4
+Sub-task,SOE input extension,Add profile selection to SOERun inputs.,Highest,SOE / Core,EPIC-4
+Sub-task,Decision provenance tagging,Tag SOE decisions with originating profile and clause.,High,SOE / Core,EPIC-4
+Sub-task,Profile traceability tests,Verify plan steps reference correct standards source.,High,QA,EPIC-4
+Story,Compliance Traceability Mapping,Expose why each plan step test or evidence exists and which standard requires it.,Highest,Compliance,EPIC-4
+Sub-task,Requirement-to-step mapping model,Create mapping between standards clauses and plan steps.,Highest,Compliance,EPIC-4
+Sub-task,GET compliance trace endpoint,Expose API to retrieve compliance justification per step.,High,API / Core,EPIC-4
+Sub-task,Compliance regression tests,Ensure traceability survives edits optimizations and overrides.,High,QA,EPIC-4
+Story,Auditor-Ready Compliance Report,Generate auditor-facing reports showing compliance coverage and deviations.,Highest,Reports / Compliance,EPIC-4
+Sub-task,Compliance report template,Define report format suitable for AS9100 NASA ISO audits.,High,Reports / Compliance,EPIC-4
+Sub-task,Compliance report generator,Generate report from approved plan and profile stack.,High,Reports / Compliance,EPIC-4
+Sub-task,Deviation and override sections,Include explicit listing of overrides approvals and justifications.,High,Reports / Compliance,EPIC-4
+Story,Ops UI – Standards & Compliance View,Expose standards profile stack and compliance traceability in Ops UI.,High,Frontend,EPIC-4
+Sub-task,Profile stack viewer,Display active standards profiles and inheritance order.,High,Frontend,EPIC-4
+Sub-task,Step compliance inspector,Allow users to click a step and see required clauses.,High,Frontend,EPIC-4
+Sub-task,Override compliance warnings,Visually warn when overrides affect compliance.,Medium,Frontend,EPIC-4
+Story,Traveler & Execution Artifact Hardening,Formalize exports into controlled traveler-style execution artifacts.,High,Exports,EPIC-4
+Sub-task,Traveler revision control,Add revision numbers and approval signatures to exports.,High,Exports,EPIC-4
+Sub-task,Traveler signature blocks,Support digital sign-off fields for production and QA.,Medium,Exports,EPIC-4
+Sub-task,Export distribution rules,Restrict traveler distribution to approved audiences.,Medium,Exports,EPIC-4
+Story,Compliance Guardrails & Red-Team Expansion,Expand red-team tests to cover standards layering and compliance bypass attempts.,Highest,QA / Compliance,EPIC-4
+Sub-task,Profile bypass red-team tests,Ensure profiles cannot be silently removed or downgraded.,Highest,QA / Compliance,EPIC-4
+Sub-task,Compliance override abuse tests,Block repeated or cascading overrides without escalation.,Highest,QA / Compliance,EPIC-4
+Story,Documentation & PRD Lock-In,Update PRD and developer documentation to lock standards layering model.,Medium,Docs,EPIC-4
+Sub-task,Update PRD compliance section,Document profile stack architecture and guarantees.,Medium,Docs,EPIC-4
+Sub-task,Developer documentation,Add guidance for adding new standards profiles.,Medium,Docs,EPIC-4

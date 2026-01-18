@@ -1,0 +1,35 @@
+{
+  "profile_id": "ISO13485_DOMAIN",
+  "profile_type": "DOMAIN",
+  "name": "ISO 13485 Medical Device Quality Management",
+  "version": "1.0.0",
+  "parent_profiles": ["BASE_IPC"],
+  "industry_domains": ["medical"],
+  "source_standards": [
+    {
+      "standard_id": "ISO 13485",
+      "clause": "7.5.6",
+      "section": "Validation of Processes for Production and Service Provision"
+    },
+    {
+      "standard_id": "ISO 13485",
+      "clause": "4.2.3",
+      "section": "Medical Device File"
+    }
+  ],
+  "standards_packs": [
+    "ISO13485_BASE",
+    "FDA_QSR_820_CORE",
+    "PROCESS_VALIDATION_IQOQPQ",
+    "DHR_DMR_EVIDENCE_BUNDLE"
+  ],
+  "inheritance_rules": {
+    "override_mode": "ADDITIVE",
+    "conflict_resolution": "ERROR"
+  },
+  "metadata": {
+    "description": "ISO 13485 medical device quality management requirements",
+    "effective_date": "2026-01-01",
+    "maintained_by": "Datum Engineering"
+  }
+}
