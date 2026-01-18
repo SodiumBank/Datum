@@ -4,5 +4,41 @@
   "industry_profiles": ["space"],
   "description": "IPC J-STD-001 with space addendum requirements",
   "references": ["IPC_J_STD_001", "IPC_J_STD_001_SPACE_ADDENDUM"],
-  "rules": []
+  "rules": [
+    {
+      "rule_id": "JSTD001.WORKMANSHIP.CLASS3",
+      "pack_id": "JSTD001_SPACE",
+      "applies": {
+        "industry_profiles": ["space"]
+      },
+      "target": {
+        "object_type": "process_step",
+        "selector": {
+          "step_type": "ASSEMBLY"
+        }
+      },
+      "when": {
+        "field": "industry_profile",
+        "operator": "equals",
+        "value": "space"
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "WARN",
+        "payload": {
+          "workmanship_class": "CLASS_3",
+          "object_id": "ASSEMBLY"
+        }
+      },
+      "why": {
+        "summary": "IPC J-STD-001 Class 3 workmanship required for space hardware",
+        "citations": ["IPC_J_STD_001_SPACE_ADDENDUM"]
+      },
+      "metadata": {
+        "severity": "high",
+        "tags": ["workmanship", "class3", "space"],
+        "version": "1.0.0"
+      }
+    }
+  ]
 }

@@ -7,6 +7,7 @@
   "rules": [
     {
       "rule_id": "SPACE.TEST.TVAC.FLIGHT",
+      "pack_id": "SPACE_ENV_TESTS",
       "applies": {
         "industry_profiles": ["space"],
         "hardware_classes": ["flight", "protoflight"]
@@ -42,6 +43,78 @@
       "why": {
         "summary": "TVAC test required for flight hardware per NASA GEVS and AS9100",
         "citations": ["NASA_GEVS", "AS9100_8_5_1"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["environmental", "test", "flight"],
+        "version": "1.0.0"
+      }
+    },
+    {
+      "rule_id": "SPACE.TEST.VIBRATION.FLIGHT",
+      "pack_id": "SPACE_ENV_TESTS",
+      "applies": {
+        "industry_profiles": ["space"],
+        "hardware_classes": ["flight"]
+      },
+      "target": {
+        "object_type": "test",
+        "selector": {
+          "test_type": "VIBRATION"
+        }
+      },
+      "when": {
+        "field": "hardware_class",
+        "operator": "equals",
+        "value": "flight"
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "test_type": "VIBRATION",
+          "object_id": "VIBRATION"
+        }
+      },
+      "why": {
+        "summary": "Vibration test required for flight hardware per NASA GEVS",
+        "citations": ["NASA_GEVS"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["environmental", "test", "flight"],
+        "version": "1.0.0"
+      }
+    },
+    {
+      "rule_id": "SPACE.TEST.SHOCK.FLIGHT",
+      "pack_id": "SPACE_ENV_TESTS",
+      "applies": {
+        "industry_profiles": ["space"],
+        "hardware_classes": ["flight"]
+      },
+      "target": {
+        "object_type": "test",
+        "selector": {
+          "test_type": "SHOCK"
+        }
+      },
+      "when": {
+        "field": "hardware_class",
+        "operator": "equals",
+        "value": "flight"
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "test_type": "SHOCK",
+          "object_id": "SHOCK"
+        }
+      },
+      "why": {
+        "summary": "Shock test required for flight hardware per NASA GEVS",
+        "citations": ["NASA_GEVS"]
       },
       "metadata": {
         "severity": "critical",

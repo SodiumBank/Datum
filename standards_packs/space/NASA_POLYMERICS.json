@@ -7,6 +7,7 @@
   "rules": [
     {
       "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+      "pack_id": "NASA_POLYMERICS",
       "applies": {
         "industry_profiles": ["space"]
       },

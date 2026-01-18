@@ -4,5 +4,96 @@
   "industry_profiles": ["automotive"],
   "description": "SPC capability requirements for automotive manufacturing",
   "references": ["IATF_16949_9.1.1"],
-  "rules": []
+  "rules": [
+    {
+      "rule_id": "AUTO.PROCESS.SPC.CAPABILITY",
+      "pack_id": "SPC_CAPABILITY",
+      "applies": {
+        "industry_profiles": ["automotive"]
+      },
+      "target": {
+        "object_type": "process_step",
+        "selector": {
+          "step_type": "SPC"
+        }
+      },
+      "when": {
+        "all": [
+          {
+            "field": "industry_profile",
+            "operator": "equals",
+            "value": "automotive"
+          },
+          {
+            "field": "context.production_volume",
+            "operator": "gt",
+            "value": 1000
+          }
+        ]
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "WARN",
+        "payload": {
+          "step_type": "SPC",
+          "object_id": "SPC_CAPABILITY",
+          "requirements": ["cpk_calculation", "spc_charting"]
+        }
+      },
+      "why": {
+        "summary": "SPC capability monitoring required for high-volume automotive production per IATF 16949 9.1.1",
+        "citations": ["IATF_16949_9.1.1"]
+      },
+      "metadata": {
+        "severity": "high",
+        "tags": ["spc", "capability", "automotive"],
+        "version": "1.0.0"
+      }
+    },
+    {
+      "rule_id": "AUTO.COST.SPC.MITIGATION",
+      "pack_id": "SPC_CAPABILITY",
+      "applies": {
+        "industry_profiles": ["automotive"]
+      },
+      "target": {
+        "object_type": "release_gate",
+        "selector": {
+          "gate_id": "GATE-RELEASE"
+        }
+      },
+      "when": {
+        "all": [
+          {
+            "field": "industry_profile",
+            "operator": "equals",
+            "value": "automotive"
+          },
+          {
+            "field": "inputs.bom_risk_flags",
+            "operator": "contains",
+            "value": "LONG_LEAD"
+          }
+        ]
+      },
+      "then": {
+        "action": "ADD_COST_MODIFIER",
+        "enforcement": "NONE",
+        "payload": {
+          "modifier_type": "PERCENT",
+          "value": 12.0,
+          "reason": "Long lead EEE mitigation + A/B testing"
+        }
+      },
+      "why": {
+        "summary": "Long-lead EEE parts require A/B testing and mitigation per automotive best practices",
+        "citations": ["IATF_16949_8.5.1"]
+      },
+      "metadata": {
+        "severity": "medium",
+        "tags": ["cost", "eee", "mitigation"],
+        "version": "1.0.0"
+      }
+    }
+  ]
 }

@@ -4,5 +4,78 @@
   "industry_profiles": ["medical"],
   "description": "Device History Record and Device Master Record evidence requirements",
   "references": ["FDA_21_CFR_820_184", "ISO_13485_4.2.4"],
-  "rules": []
+  "rules": [
+    {
+      "rule_id": "MEDICAL.EVIDENCE.DHR.REQUIRED",
+      "pack_id": "DHR_DMR_EVIDENCE_BUNDLE",
+      "applies": {
+        "industry_profiles": ["medical"]
+      },
+      "target": {
+        "object_type": "evidence",
+        "selector": {
+          "evidence_type": "DHR"
+        }
+      },
+      "when": {
+        "field": "industry_profile",
+        "operator": "equals",
+        "value": "medical"
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "evidence_type": "DHR",
+          "applies_to": "production_batch",
+          "retention": "LIFE_OF_DEVICE_PLUS_2_YEARS"
+        }
+      },
+      "why": {
+        "summary": "Device History Record required for medical devices per FDA QSR 820.184",
+        "citations": ["FDA_21_CFR_820_184", "ISO_13485_4.2.4"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["evidence", "dhr", "medical"],
+        "version": "1.0.0"
+      }
+    },
+    {
+      "rule_id": "MEDICAL.EVIDENCE.DMR.REQUIRED",
+      "pack_id": "DHR_DMR_EVIDENCE_BUNDLE",
+      "applies": {
+        "industry_profiles": ["medical"]
+      },
+      "target": {
+        "object_type": "document",
+        "selector": {
+          "doc_type": "DMR"
+        }
+      },
+      "when": {
+        "field": "industry_profile",
+        "operator": "equals",
+        "value": "medical"
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "doc_type": "DMR",
+          "object_id": "DMR",
+          "requirements": ["design_specs", "process_specs", "quality_specs"]
+        }
+      },
+      "why": {
+        "summary": "Device Master Record required for medical devices per FDA QSR 820.181",
+        "citations": ["FDA_21_CFR_820_181"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["document", "dmr", "medical"],
+        "version": "1.0.0"
+      }
+    }
+  ]
 }
