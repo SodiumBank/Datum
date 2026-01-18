@@ -168,8 +168,11 @@ def test_apply_plan_edit_creates_new_version(sample_plan):
     """Test that editing creates a new version."""
     save_plan(sample_plan)
     
+    # Remove step_002 (non-SOE step), keeping step_001 and step_soe_001
     edits = {
-        "steps": sample_plan["steps"][:2],  # Remove one non-SOE step
+        "steps": [
+            s for s in sample_plan["steps"] if s["step_id"] != "step_002"
+        ],
     }
     
     edited_plan = apply_plan_edit(
