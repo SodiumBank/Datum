@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, TypedDict
 
 from services.api.core.schema_validation import validate_schema
+from services.api.core.profile_stack import resolve_profile_stack, tag_decision_with_profile, load_profile
 
 ROOT = Path(__file__).resolve().parents[3]
 SOE_PACKS_DIR = ROOT / "standards_packs"
@@ -266,22 +267,47 @@ def evaluate_soe(
     inputs: Dict[str, Any],
     hardware_class: str | None = None,
     additional_packs: List[str] | None = None,
+    active_profiles: List[str] | None = None,
 ) -> SOERun:
     """
-    Evaluate SOE rules and generate SOERun.
+    Evaluate SOE rules and generate SOERun (Sprint 4: with profile stack support).
     
     Args:
         industry_profile: Industry profile name (space, aerospace, medical, etc.)
         inputs: Project inputs (processes, tests_requested, materials, bom_risk_flags)
         hardware_class: Optional hardware class (flight, class_2, etc.)
         additional_packs: Optional additional packs beyond defaults
+        active_profiles: Optional profile stack (Sprint 4: BASE/DOMAIN/CUSTOMER_OVERRIDE)
     
     Returns:
-        SOERun object with decisions, gates, and modifiers
+        SOERun object with decisions, gates, and modifiers (including profile_stack if active_profiles provided)
     """
-    # Resolve active packs
-    default_packs = _resolve_active_packs(industry_profile, hardware_class)
-    active_packs = list(set(default_packs + (additional_packs or [])))
+    # Resolve active packs (Sprint 4: can come from profile stack)
+    profile_stack: List[Dict[str, Any]] = []
+    if active_profiles:
+        # Resolve profile stack
+        try:
+            resolved_profiles, errors = resolve_profile_stack(active_profiles)
+            if errors:
+                print(f"Warning: Profile stack errors: {errors}")
+            else:
+                profile_stack = resolved_profiles
+                # Extract packs from profile stack
+                pack_ids_from_profiles = set()
+                for profile in resolved_profiles:
+                    pack_ids_from_profiles.update(profile.get("standards_packs", []))
+                # Merge with defaults
+                default_packs = _resolve_active_packs(industry_profile, hardware_class)
+                active_packs = list(pack_ids_from_profiles | set(default_packs + (additional_packs or [])))
+        except Exception as e:
+            print(f"Warning: Failed to resolve profile stack: {e}")
+            # Fallback to default pack resolution
+            default_packs = _resolve_active_packs(industry_profile, hardware_class)
+            active_packs = list(set(default_packs + (additional_packs or [])))
+    else:
+        # Sprint 3 behavior: resolve from industry profile
+        default_packs = _resolve_active_packs(industry_profile, hardware_class)
+        active_packs = list(set(default_packs + (additional_packs or [])))
     
     # Build evaluation context
     context: Dict[str, Any] = {
@@ -304,12 +330,38 @@ def evaluate_soe(
             print(f"Warning: Failed to load pack {pack_id}: {e}")
             continue
     
-    # Evaluate rules and collect decisions
+    # Evaluate rules and collect decisions (Sprint 4: tag with profile source)
     decisions: List[SOEDecision] = []
+    
+    # Build pack_id -> profile mapping for tagging
+    pack_to_profile: Dict[str, Dict[str, Any]] = {}
+    if profile_stack:
+        for profile in profile_stack:
+            for pack_id in profile.get("standards_packs", []):
+                pack_to_profile[pack_id] = {
+                    "profile_id": profile["profile_id"],
+                    "profile_type": profile["profile_type"],
+                    "layer": profile_stack.index(profile),
+                }
     
     for rule in all_rules:
         if _evaluate_rule(rule, context, industry_profile, hardware_class):
             decision = _apply_rule_action(rule, context)
+            
+            # Sprint 4: Tag decision with profile source
+            pack_id = rule.get("pack_id")
+            if pack_id and pack_id in pack_to_profile:
+                profile_info = pack_to_profile[pack_id]
+                # Get clause reference from rule why if available
+                clause_ref = rule.get("why", {}).get("citations", [None])[0] if rule.get("why", {}).get("citations") else None
+                decision = tag_decision_with_profile(
+                    decision,
+                    profile_id=profile_info["profile_id"],
+                    profile_type=profile_info["profile_type"],
+                    layer=profile_info["layer"],
+                    clause_reference=clause_ref,
+                )
+            
             decisions.append(decision)
     
     # Build gates from decisions
@@ -368,8 +420,8 @@ def evaluate_soe(
                 "rule_id": decision["why"]["rule_id"],
             })
     
-    # Build SOERun
-    soe_run: SOERun = {
+    # Build SOERun (Sprint 4: include profile_stack if available)
+    soe_run_base: Dict[str, Any] = {
         "soe_version": "1.0.0",
         "industry_profile": industry_profile,
         "hardware_class": hardware_class,
@@ -380,6 +432,21 @@ def evaluate_soe(
         "gates": gates,
         "cost_modifiers": cost_modifiers,
     }
+    
+    # Sprint 4: Add profile stack metadata if profiles were used
+    if profile_stack:
+        soe_run_base["active_profiles"] = [p["profile_id"] for p in profile_stack]
+        soe_run_base["profile_stack"] = [
+            {
+                "profile_id": p["profile_id"],
+                "profile_type": p["profile_type"],
+                "name": p.get("name"),
+                "layer": profile_stack.index(p),
+            }
+            for p in profile_stack
+        ]
+    
+    soe_run: SOERun = soe_run_base  # type: ignore
     
     # Validate against schema
     try:

@@ -1,0 +1,33 @@
+{
+  "profile_id": "AS9100_DOMAIN",
+  "profile_type": "DOMAIN",
+  "name": "AS9100 Aerospace Quality Management",
+  "version": "1.0.0",
+  "parent_profiles": ["BASE_IPC"],
+  "industry_domains": ["space", "aerospace"],
+  "source_standards": [
+    {
+      "standard_id": "AS9100",
+      "clause": "8.5.1",
+      "section": "Control of Production and Service Provision"
+    },
+    {
+      "standard_id": "AS9100",
+      "clause": "8.5.2",
+      "section": "Identification and Traceability"
+    }
+  ],
+  "standards_packs": [
+    "AS9100_BASE",
+    "JSTD001_SPACE"
+  ],
+  "inheritance_rules": {
+    "override_mode": "ADDITIVE",
+    "conflict_resolution": "ERROR"
+  },
+  "metadata": {
+    "description": "AS9100 aerospace quality management system requirements",
+    "effective_date": "2026-01-01",
+    "maintained_by": "Datum Engineering"
+  }
+}
