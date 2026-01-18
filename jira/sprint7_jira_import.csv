@@ -1,0 +1,26 @@
+Issue Type,Summary,Description,Priority,Component,Epic Name
+Epic,Sprint 7 – Stabilize Core, Enforce Tiers, Align Docs,"Make current implementation match PRD: tests runnable, schema-valid plans, tier gating enforced server-side, and docs match real endpoints.",Highest,Program,EPIC-7
+Story,Make tests runnable from repo root,"Fix ModuleNotFoundError: 'services' during pytest collection when run from repo root.",Highest,QA/DevEx,EPIC-7
+Sub-task,Add package/bootstrap for services imports,"Add services/__init__.py OR conftest.py that inserts repo root into sys.path. Pick one canonical approach and document it in TESTING.md.",Highest,QA/DevEx,EPIC-7
+Sub-task,Update CI test invocation,"Update workflows (or scripts) so CI runs pytest from repo root without manual PYTHONPATH requirements.",High,CI,EPIC-7
+Sub-task,Add a 'smoke import' test,"Add a unit test that imports services.api.main and asserts app exists to catch regressions early.",Medium,QA,EPIC-7
+Story,Fix plan generator to satisfy datum_plan_step schema,"Default steps currently violate schema (parameters None, acceptance None, source_rules empty). Make generated plans schema-valid and deterministic.",Highest,Core/API,EPIC-7
+Sub-task,Remove None values from step fields,"Omit parameters/acceptance when unknown or set to {}. Do not emit nulls for object fields.",Highest,Core,EPIC-7
+Sub-task,Populate source_rules for baseline steps,"Ensure source_rules has at least one ref for every step (e.g., BASELINE_DEFAULT_STEP with ruleset_version).",Highest,Core,EPIC-7
+Sub-task,Add regression test: plan generate passes schema validation,"Add/extend test_schema_validation so POST /plans/generate produces a plan that validates against schemas.",High,QA,EPIC-7
+Story,Mount Profiles router and validate documented /profiles endpoints,"API docs list /profiles endpoints but router is not mounted in main.py. Make endpoints reachable.",Highest,API,EPIC-7
+Sub-task,Wire profiles router in services/api/main.py,"Import profiles router and include_router with prefix /profiles and tags.",Highest,API,EPIC-7
+Sub-task,Add contract test for /profiles routes,"Add a small test that calls key /profiles endpoints (state/validate/bundles list) to ensure route exists.",High,QA,EPIC-7
+Story,Implement Outputs export endpoint (or remove from docs),"API docs list /outputs/{plan_id}/export, but no endpoint exists. Either implement with approval gating or remove from docs.",High,API/Exports,EPIC-7
+Sub-task,Add POST /outputs/{plan_id}/export,"Implement export endpoint gated by plan approval + tier (Tier 3 only). Output should include provenance + hash.",High,API/Exports,EPIC-7
+Sub-task,Add tests for outputs export gating,"Verify: unapproved plan export rejected; Tier < 3 rejected; approved Tier 3 succeeds.",High,QA,EPIC-7
+Sub-task,If export is deferred: remove/flag endpoint in API_ENDPOINTS.md,"If you choose not to ship export this sprint, docs must not claim it exists.",Medium,Docs,EPIC-7
+Story,Align API_ENDPOINTS.md with real routers,"Ensure docs match reality: only list routes that are mounted and implemented. Add a checklist process.",Medium,Docs,EPIC-7
+Sub-task,Audit all routers vs docs,"Compare services/api/routers/* against API_ENDPOINTS.md and fix mismatches.",Medium,Docs,EPIC-7
+Sub-task,Add automated doc consistency check,"Optional: lightweight script that parses router decorators and compares to a maintained allowlist, failing CI on mismatches.",Low,CI/Docs,EPIC-7
+Story,Strengthen server-side Tier enforcement,"PRD requires server-side tier enforcement. Ensure Tier 3 actions are contract-gated and audited.",High,Compliance/Core,EPIC-7
+Sub-task,Enforce tier checks on plan export and outputs export,"Require quote.tier >= TIER_3 for Tier 3 exports; return 403 with clear message otherwise.",High,Compliance/Core,EPIC-7
+Sub-task,Add audit events for gated actions,"When an export is attempted/allowed/denied, write an audit event record (who, when, plan/version, reason).",Medium,Compliance,EPIC-7
+Sub-task,Add red-team test: bypass tier gating,"Add a test that attempts to export Tier 3 artifacts from Tier 1/2 and ensure it fails deterministically.",Medium,QA/Compliance,EPIC-7
+Story,Repo hygiene: remove committed .pytest_cache and add ignore,"The repo contains .pytest_cache inside the zip; enforce clean repo hygiene.",Low,DevEx,EPIC-7
+Sub-task,Add .gitignore entries,"Ignore .pytest_cache and other generated artifacts; remove from tracked files.",Low,DevEx,EPIC-7

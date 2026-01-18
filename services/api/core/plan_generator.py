@@ -333,12 +333,14 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                             "sequence": sequence_counter,
                             "required": True,
                             "locked_sequence": lock_sequence,
-                            "acceptance": {
-                                "criteria": f"NASA-STD-8739.1 compliance for {step_name}",
-                                "sampling": "100_PERCENT",
-                            } if step_type == "INSPECT" else None,
                             "source_rules": [source_rule],
                         }
+                        # Add optional fields
+                        if step_type == "INSPECT":
+                            new_step["acceptance"] = {
+                                "criteria": f"NASA-STD-8739.1 compliance for {step_name}",
+                                "sampling": "100_PERCENT",
+                            }
                         new_steps.append(new_step)
                         if lock_sequence:
                             locked_sequences.add(sequence_counter)
@@ -452,11 +454,6 @@ def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: Lis
                 "sequence": sequence_counter,
                 "required": True,
                 "locked_sequence": decision.get("enforcement") == "BLOCK_RELEASE",
-                "parameters": {"test_type": object_id} if step_type == "TEST" else None,
-                "acceptance": {
-                    "criteria": f"SOE requirement: {', '.join(decision['why'].get('citations', [decision['why']['rule_id']]))}",
-                    "sampling": "100_PERCENT",
-                } if step_type in ("TEST", "INSPECT") else None,
                 "source_rules": [{
                     "rule_id": decision["why"]["rule_id"],
                     "ruleset_version": 1,  # SOE ruleset
@@ -465,6 +462,14 @@ def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: Lis
                 "soe_decision_id": decision["id"],
                 "soe_why": soe_why,
             }
+            # Add optional fields only if present
+            if step_type == "TEST":
+                new_step["parameters"] = {"test_type": object_id}
+            if step_type in ("TEST", "INSPECT"):
+                new_step["acceptance"] = {
+                    "criteria": f"SOE requirement: {', '.join(decision['why'].get('citations', [decision['why']['rule_id']]))}",
+                    "sampling": "100_PERCENT",
+                }
             new_steps.append(new_step)
     
     return new_steps
@@ -661,6 +666,10 @@ def generate_plan(
     
     # Sort steps by sequence
     steps.sort(key=lambda s: s["sequence"])
+    
+    # Sprint 7: Ensure all steps are schema-compliant before validation
+    for i, step in enumerate(steps):
+        steps[i] = _ensure_step_schema_compliant(step, ruleset_version=ruleset_version)
     
     # Apply locked sequences
     for step in steps:
