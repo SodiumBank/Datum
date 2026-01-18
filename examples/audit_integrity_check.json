@@ -1,0 +1,71 @@
+{
+  "plan_id": "plan_test_001",
+  "overall_status": "PASS",
+  "checks": [
+    {
+      "check_id": "plan_exists",
+      "status": "PASS",
+      "reason": "Plan found"
+    },
+    {
+      "check_id": "plan_approved",
+      "status": "PASS",
+      "reason": "Plan is approved"
+    },
+    {
+      "check_id": "plan_provenance",
+      "status": "PASS",
+      "reason": "Plan has complete provenance metadata",
+      "details": {
+        "version": 1,
+        "approved_by": "ops_user_001",
+        "approved_at": "2026-01-15T10:30:00Z"
+      }
+    },
+    {
+      "check_id": "soe_run_traceable",
+      "status": "PASS",
+      "reason": "SOE run found and traceable",
+      "details": {
+        "soe_run_id": "soe_run_001",
+        "industry_profile": "space",
+        "decision_count": 5
+      }
+    },
+    {
+      "check_id": "profile_states_valid",
+      "status": "PASS",
+      "reason": "All profiles in stack are approved or deprecated",
+      "details": {
+        "profile_count": 2,
+        "profile_states": {
+          "BASE_IPC": "approved",
+          "AS9100_DOMAIN": "approved"
+        }
+      }
+    },
+    {
+      "check_id": "profile_stack_recorded",
+      "status": "PASS",
+      "reason": "Profile stack recorded with 2 profiles",
+      "details": {
+        "active_profiles": ["BASE_IPC", "AS9100_DOMAIN"],
+        "profile_stack_layers": [0, 1]
+      }
+    },
+    {
+      "check_id": "soe_decision_ids_deterministic",
+      "status": "PASS",
+      "reason": "All 5 decision IDs have deterministic format"
+    },
+    {
+      "check_id": "plan_soe_traceability",
+      "status": "PASS",
+      "reason": "Plan references 5 SOE decision IDs",
+      "details": {
+        "steps_with_soe_refs": 3,
+        "total_steps": 8
+      }
+    }
+  ]
+}

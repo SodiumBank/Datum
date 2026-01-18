@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from services.api.core.deps import require_role
 from services.api.core.compliance_trace import get_plan_compliance_trace
 from services.api.core.compliance_report_renderer import generate_compliance_report
+from services.api.core.audit_integrity import check_audit_integrity, summarize_audit_integrity
 
 router = APIRouter()
 
@@ -82,6 +83,48 @@ def get_step_compliance_endpoint(
         "step_title": step.get("title"),
         "compliance_trace": trace,
     }
+
+
+@router.get("/plans/{plan_id}/audit-integrity")
+def get_audit_integrity_endpoint(
+    plan_id: str,
+    summary: bool = False,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """
+    Check audit integrity for a plan (Sprint 6).
+    
+    Returns structured checklist verifying:
+    - Plan is approved
+    - Profile states are valid
+    - SOE traceability
+    - Export/report hashes present (if applicable)
+    
+    Args:
+        plan_id: Plan ID to check
+        summary: If true, return human-readable summary instead of structured checklist
+    
+    Returns:
+        Audit integrity checklist or summary string
+    """
+    try:
+        checklist = check_audit_integrity(plan_id)
+        
+        if summary:
+            summary_text = summarize_audit_integrity(checklist)
+            return {"summary": summary_text}
+        
+        return checklist
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to check audit integrity: {str(e)}",
+        ) from e
 
 
 @router.post("/plans/{plan_id}/reports/generate")
