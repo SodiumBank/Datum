@@ -296,18 +296,18 @@ def evaluate_soe(
                 pack_ids_from_profiles = set()
                 for profile in resolved_profiles:
                     pack_ids_from_profiles.update(profile.get("standards_packs", []))
-                # Merge with defaults
+                # Merge with defaults - DETERMINISTIC: sorted() for consistent order
                 default_packs = _resolve_active_packs(industry_profile, hardware_class)
-                active_packs = list(pack_ids_from_profiles | set(default_packs + (additional_packs or [])))
+                active_packs = sorted(pack_ids_from_profiles | set(default_packs) | set(additional_packs or []))
         except Exception as e:
             print(f"Warning: Failed to resolve profile stack: {e}")
-            # Fallback to default pack resolution
+            # Fallback to default pack resolution - DETERMINISTIC: sorted()
             default_packs = _resolve_active_packs(industry_profile, hardware_class)
-            active_packs = list(set(default_packs + (additional_packs or [])))
+            active_packs = sorted(set(default_packs) | set(additional_packs or []))
     else:
-        # Sprint 3 behavior: resolve from industry profile
+        # Sprint 3 behavior: resolve from industry profile - DETERMINISTIC: sorted()
         default_packs = _resolve_active_packs(industry_profile, hardware_class)
-        active_packs = list(set(default_packs + (additional_packs or [])))
+        active_packs = sorted(set(default_packs) | set(additional_packs or []))
     
     # Build evaluation context
     context: Dict[str, Any] = {
@@ -333,15 +333,21 @@ def evaluate_soe(
     # Evaluate rules and collect decisions (Sprint 4: tag with profile source)
     decisions: List[SOEDecision] = []
     
-    # Build pack_id -> profile mapping for tagging
+    # Build pack_id -> profile mapping for tagging (Sprint 4: semantic layers)
+    TYPE_LAYER = {"BASE": 0, "DOMAIN": 1, "CUSTOMER_OVERRIDE": 2}
     pack_to_profile: Dict[str, Dict[str, Any]] = {}
     if profile_stack:
         for profile in profile_stack:
+            # Use semantic layer (0=BASE, 1=DOMAIN, 2=CUSTOMER_OVERRIDE) not index
+            layer = TYPE_LAYER.get(profile.get("profile_type", ""), 0)
             for pack_id in profile.get("standards_packs", []):
+                # If collision, keep the higher layer (customer override wins)
+                if pack_id in pack_to_profile and pack_to_profile[pack_id]["layer"] > layer:
+                    continue
                 pack_to_profile[pack_id] = {
                     "profile_id": profile["profile_id"],
                     "profile_type": profile["profile_type"],
-                    "layer": profile_stack.index(profile),
+                    "layer": layer,  # Semantic layer, not index
                 }
     
     for rule in all_rules:
