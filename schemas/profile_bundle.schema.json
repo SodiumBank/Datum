@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/profile_bundle.schema.json",
+  "title": "Standards Profile Bundle",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bundle_id",
+    "name",
+    "profile_ids"
+  ],
+  "properties": {
+    "bundle_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_.-]+$",
+      "description": "Unique bundle identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable bundle name"
+    },
+    "profile_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_.-]+$"
+      },
+      "minItems": 1,
+      "description": "List of profile IDs in this bundle"
+    },
+    "program_id": {
+      "type": "string",
+      "description": "Optional program identifier this bundle belongs to"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "Optional customer identifier this bundle belongs to"
+    },
+    "contract_id": {
+      "type": "string",
+      "description": "Optional contract identifier this bundle belongs to"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "effective_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "maintained_by": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
