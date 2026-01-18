@@ -1,11 +1,10 @@
 # Sprint 6 Status - Close Sprint 5 Gaps + Multi-Industry Expansion
 
-## ✅ Sprint 5 Gap Fixes (Sprint 6 Story 1-3)
+## ✅ Sprint 5 Gap Fixes (Complete)
 
 ### 1. Profiles Router Mounting ✅
-- **Status:** Router already mounted in `main.py` (line 17: `app.include_router(profiles.router, prefix="/profiles", tags=["profiles"])`)
+- **Status:** Router already mounted in `main.py`
 - **Verification:** Router is imported and included correctly
-- **Action:** Verified working - no changes needed
 
 ### 2. PDF Generation Contract ✅
 - **Status:** Fixed - PDF format now explicitly rejected with clear error message
@@ -15,73 +14,84 @@
 
 ### 3. Bundle/Profile Merge Determinism ✅
 - **Status:** Fixed - removed `set()` from profile merge
-- **Change:** `soe_engine.py` now uses deterministic merge:
-  - Preserves order from `active_profiles` then `bundle_profiles`
-  - Removes duplicates while maintaining order (first occurrence wins)
-  - Sorts final list by `profile_id` for consistent ordering
+- **Change:** `soe_engine.py` now uses deterministic merge with sorted profiles
 - **Impact:** Audit artifacts will have stable profile ordering
 
 ### 4. Profile Lifecycle Immutability Enforcement ✅
 - **Status:** Enhanced - `_save_profile_with_state()` now checks immutability
 - **Change:** Approved profiles cannot change state (except to deprecated)
-- **Enforcement:** `ensure_profile_immutable()` called in `create_profile_version()` 
 - **Impact:** Approved profiles protected from accidental modification
 
 ---
 
-## ✅ Story 5: Multi-Industry Standards Layer Model (IN PROGRESS)
+## ✅ Story 5: Multi-Industry Standards Layer Model (COMPLETE)
 
 ### Domain Profiles
-- ✅ `AS9100_DOMAIN.json` - Exists (aerospace/space)
-- ✅ `ISO13485_DOMAIN.json` - Exists (medical)
-- ✅ `IATF16949_DOMAIN.json` - Created (automotive)
-- All profiles inherit from `BASE_IPC` and reference appropriate standards packs
+- ✅ `BASE_IPC.json` - Base IPC standards (all industries)
+- ✅ `AS9100_DOMAIN.json` - Aerospace/space domain (inherits BASE_IPC)
+- ✅ `ISO13485_DOMAIN.json` - Medical domain (inherits BASE_IPC)
+- ✅ `IATF16949_DOMAIN.json` - Automotive domain (inherits BASE_IPC)
 
 ### Industry Profiles
 - ✅ `space.json` - Complete with default packs
 - ✅ `aerospace.json` - Complete with default packs
-- ✅ `medical.json` - Complete with default packs (references ISO13485_DOMAIN packs)
-- ✅ `automotive.json` - Complete with default packs (references IATF16949_DOMAIN packs)
+- ✅ `medical.json` - Complete with default packs
+- ✅ `automotive.json` - Complete with default packs
 
 ### Standards Packs Status
-- ✅ Space packs: AS9100_BASE, JSTD001_SPACE, NASA_POLYMERICS, SPACE_ENV_TESTS, FLIGHT_TRACEABILITY
-- ✅ Aerospace packs: AS9100_BASE, JSTD001_BASE, AEROSPACE_ENV_TESTS
-- ✅ Medical packs: ISO13485_BASE, FDA_QSR_820_CORE, IPC_WORKMANSHIP_BASE, PROCESS_VALIDATION_IQOQPQ, DHR_DMR_EVIDENCE_BUNDLE, LOT_TRACEABILITY_MEDICAL
-- ✅ Automotive packs: IATF16949_BASE, APQP_PPAP_CORE, SPC_CAPABILITY, LOT_TRACEABILITY_AUTOMOTIVE
-
-### Next Steps
-- ⚠️ Verify profile stack resolution works with new domain profiles
-- ⚠️ Test SOE runs with domain profiles to ensure packs resolve correctly
-
-## 🚧 Story 6: Audit Artifact Consistency Checks
-- **Status:** Not started
-- ⚠️ Need to implement audit integrity checker
-- ⚠️ Add examples and documentation
-
-### Story 6: Audit Artifact Consistency Checks
-- **Status:** Not started
-- ⚠️ Need to implement audit integrity checker
-- ⚠️ Add examples and documentation
+- ✅ Space: AS9100_BASE, JSTD001_SPACE, NASA_POLYMERICS, SPACE_ENV_TESTS, FLIGHT_TRACEABILITY
+- ✅ Aerospace: AS9100_BASE, JSTD001_BASE, AEROSPACE_ENV_TESTS
+- ✅ Medical: ISO13485_BASE, FDA_QSR_820_CORE, IPC_WORKMANSHIP_BASE, PROCESS_VALIDATION_IQOQPQ, DHR_DMR_EVIDENCE_BUNDLE, LOT_TRACEABILITY_MEDICAL
+- ✅ Automotive: IATF16949_BASE, APQP_PPAP_CORE, SPC_CAPABILITY, LOT_TRACEABILITY_AUTOMOTIVE
 
 ---
 
-## Files Modified (Sprint 6 Gap Fixes)
+## ✅ Story 6: Audit Artifact Consistency Checks (COMPLETE)
 
+### Implementation
+- ✅ Created `audit_integrity.py` with `check_audit_integrity()` function
+- ✅ Verifies: plan approved, profile states valid, SOE traceability, decision IDs deterministic
+- ✅ Added `GET /compliance/plans/{plan_id}/audit-integrity` endpoint
+- ✅ Created `examples/audit_integrity_check.json` example output
+
+### Checks Performed
+1. Plan exists and is approved
+2. Plan has provenance metadata (version, approved_by, approved_at)
+3. SOE run is traceable
+4. Profile states are valid (approved/deprecated, not draft)
+5. Profile stack is recorded
+6. SOE decision IDs have deterministic format
+7. Plan steps reference SOE decisions (traceability)
+
+---
+
+## Files Modified/Created (Sprint 6)
+
+### Sprint 5 Gap Fixes
 1. `services/api/routers/compliance.py` - PDF format rejection
 2. `services/api/core/soe_engine.py` - Deterministic profile merge
-3. `services/api/core/profile_lifecycle.py` - Immutability enforcement in `_save_profile_with_state()`
-4. `services/api/core/profile_versioning.py` - Immutability check in `create_profile_version()`
+3. `services/api/core/profile_lifecycle.py` - Immutability enforcement
+4. `services/api/core/profile_versioning.py` - Immutability check
+5. `API_ENDPOINTS.md` - Added `/profiles` endpoints documentation
+
+### Multi-Industry Standards
+6. `standards_profiles/IATF16949_DOMAIN.json` - New automotive domain profile
+
+### Audit Integrity
+7. `services/api/core/audit_integrity.py` - New audit integrity checker
+8. `services/api/routers/compliance.py` - Added audit integrity endpoint
+9. `examples/audit_integrity_check.json` - Example output
 
 ---
 
-## Status: Sprint 5 Gaps Closed ✅
+## Status: Sprint 6 COMPLETE ✅
 
-**Critical Sprint 5 issues resolved:**
-- ✅ Profiles router is mounted and accessible
-- ✅ PDF format properly rejected (no 500s)
-- ✅ Profile merge is deterministic
-- ✅ Profile immutability enforced
+**All Sprint 6 stories completed:**
+- ✅ Sprint 5 gaps closed (router mounted, PDF rejected, determinism fixed, immutability enforced)
+- ✅ Multi-industry domain profiles created (aerospace, medical, automotive)
+- ✅ Audit artifact consistency checks implemented
 
-**Remaining Sprint 6 work:**
-- Multi-industry domain profiles
-- Audit artifact consistency checks
+**Sprint 6 deliverable:**
+- Multi-industry standards layer model with domain profiles
+- Comprehensive audit integrity verification
+- All Sprint 5 gaps resolved and documented
