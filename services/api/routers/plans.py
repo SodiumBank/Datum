@@ -78,7 +78,7 @@ def get_plan_endpoint(
     plan_id: str,
     auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
 ):
-    """Get a specific plan by ID."""
+    """Get a specific plan by ID (Sprint 2: read-only intent layer)."""
     plan = get_plan(plan_id)
     if not plan:
         raise HTTPException(
@@ -86,6 +86,23 @@ def get_plan_endpoint(
             detail=f"Plan not found: {plan_id}",
         )
     return plan
+
+
+@router.get("/quote/{quote_id}")
+def get_plan_by_quote_endpoint(
+    quote_id: str,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """Get plan by quote ID (Sprint 2: read-only intent layer)."""
+    plans = list_plans(quote_id=quote_id)
+    if not plans:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Plan not found for quote: {quote_id}",
+        )
+    # Return most recent plan
+    plans.sort(key=lambda p: p.get("created_at", ""), reverse=True)
+    return plans[0]
 
 
 @router.get("")

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from services.api.routers import auth, health, uploads, quotes, rules, plans, tests, revisions, soe
+from services.api.routers import auth, health, uploads, quotes, rules, plans, tests, revisions, soe, outputs
 
 app = FastAPI(title="Datum API", version="0.1.0")
 
