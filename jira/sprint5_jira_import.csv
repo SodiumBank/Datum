@@ -1,0 +1,41 @@
+Issue Type,Summary,Description,Priority,Component,Epic Name
+Epic,Sprint 5 – Auditor-Grade Reporting & Profile Lifecycle,Finalize Datum as a compliance system of record with auditor-ready reports and governed standards profile lifecycle.,Highest,Program,EPIC-5
+
+Story,Auditor-Grade Compliance Report Generator,Generate formal auditor-facing compliance reports suitable for AS9100 ISO 13485 and NASA reviews.,Highest,Reports / Compliance,EPIC-5
+Sub-task,Define auditor report structure,Define standard report sections: scope standards coverage deviations overrides approvals and traceability.,Highest,Reports / Compliance,EPIC-5
+Sub-task,Compliance report renderer,Generate PDF and HTML reports from approved plans and profile stacks.,High,Reports / Compliance,EPIC-5
+Sub-task,Clause coverage table,Include matrix mapping plan steps to standards clauses.,High,Reports / Compliance,EPIC-5
+Sub-task,Override and deviation section,Explicitly list overrides justifications approvers and dates.,High,Reports / Compliance,EPIC-5
+
+Story,Standards Profile Lifecycle Management,Introduce lifecycle states for standards profiles similar to plan approvals.,Highest,Compliance / Governance,EPIC-5
+Sub-task,Profile states implementation,Add draft submitted approved deprecated states for profiles.,Highest,Compliance / Governance,EPIC-5
+Sub-task,Profile approval endpoints,Add submit approve reject endpoints for standards profiles.,High,API / Core,EPIC-5
+Sub-task,Profile immutability enforcement,Prevent modification of approved profiles.,High,Compliance / Governance,EPIC-5
+
+Story,Profile Versioning and History,Track versions of standards profiles with full audit history.,High,Compliance / Data Model,EPIC-5
+Sub-task,Profile version schema,Add version identifiers and parent references to profiles.,High,Compliance / Data Model,EPIC-5
+Sub-task,Profile diff engine,Support comparison between profile versions.,Medium,Core Logic,EPIC-5
+Sub-task,Profile history API,Expose GET endpoints to retrieve profile versions and diffs.,Medium,API / Core,EPIC-5
+
+Story,Program and Customer Profile Bundles,Support grouping profiles by program customer or contract.,High,Compliance / SOE,EPIC-5
+Sub-task,Profile bundle model,Define bundle schema referencing multiple profiles.,High,Compliance / SOE,EPIC-5
+Sub-task,SOE bundle selection,Allow SOE runs to select a bundle instead of individual profiles.,High,SOE / Core,EPIC-5
+Sub-task,Bundle traceability tests,Ensure compliance trace reflects bundle membership.,High,QA,EPIC-5
+
+Story,Ops UI – Compliance & Audit Views,Expose auditor-grade compliance and profile lifecycle views in Ops UI.,High,Frontend,EPIC-5
+Sub-task,Compliance report viewer,Allow users to view generated compliance reports in UI.,High,Frontend,EPIC-5
+Sub-task,Profile lifecycle controls,Add UI controls for submitting approving and viewing profiles.,High,Frontend,EPIC-5
+Sub-task,Profile history viewer,Display profile version history and diffs.,Medium,Frontend,EPIC-5
+
+Story,Export Hardening for Audits,Strengthen export artifacts to survive external audits.,High,Exports / Compliance,EPIC-5
+Sub-task,Export checksum and hash,Include cryptographic hash for exported travelers and reports.,High,Exports / Compliance,EPIC-5
+Sub-task,Export provenance metadata,Embed plan version profile stack and approvals in exports.,High,Exports / Compliance,EPIC-5
+Sub-task,Read-only export enforcement,Ensure exported artifacts cannot be regenerated after revocation.,Medium,Exports / Compliance,EPIC-5
+
+Story,Compliance Red-Team Expansion,Expand red-team tests for audit and profile lifecycle abuse.,Highest,QA / Compliance,EPIC-5
+Sub-task,Profile downgrade attack tests,Prevent using deprecated or draft profiles in production plans.,Highest,QA / Compliance,EPIC-5
+Sub-task,Approval bypass tests,Block report or export generation without full approvals.,Highest,QA / Compliance,EPIC-5
+
+Story,Documentation and Audit Playbooks,Provide auditor-facing documentation and internal playbooks.,Medium,Docs,EPIC-5
+Sub-task,Auditor walkthrough guide,Document how to navigate Datum during an audit.,Medium,Docs,EPIC-5
+Sub-task,Internal compliance playbook,Document internal rules for profile and plan governance.,Medium,Docs,EPIC-5

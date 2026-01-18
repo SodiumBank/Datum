@@ -306,6 +306,7 @@ def evaluate_soe(
             is_valid, error_msg = validate_profile_for_use(profile_id, allow_draft=False)
             if not is_valid:
                 raise ValueError(f"Profile {profile_id} cannot be used: {error_msg}")
+        
         # Resolve profile stack
         try:
             resolved_profiles, errors = resolve_profile_stack(active_profiles)
