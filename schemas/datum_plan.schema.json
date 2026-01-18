@@ -34,6 +34,66 @@
       "minItems": 1,
       "items": { "$ref": "./datum_plan_step.schema.json" }
     },
+    "soe_run_id": {
+      "type": "string",
+      "description": "Reference to the SOERun that generated this plan"
+    },
+    "soe_decision_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^DEC-[0-9A-F]{8}$" },
+      "description": "List of SOE decision IDs that influenced this plan",
+      "default": []
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["test_id", "test_type", "required", "soe_decision_id"],
+        "properties": {
+          "test_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+          "test_type": { "type": "string" },
+          "title": { "type": "string" },
+          "required": { "type": "boolean" },
+          "acceptance_criteria": { "type": "string" },
+          "soe_decision_id": { "type": "string", "pattern": "^DEC-[0-9A-F]{8}$" },
+          "soe_why": {
+            "type": "object",
+            "properties": {
+              "rule_id": { "type": "string" },
+              "pack_id": { "type": "string" },
+              "citations": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      },
+      "description": "Test intent derived from SOE decisions",
+      "default": []
+    },
+    "evidence_intent": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "evidence_type", "retention", "soe_decision_id"],
+        "properties": {
+          "evidence_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+          "evidence_type": { "type": "string" },
+          "applies_to": { "type": "string" },
+          "object_id": { "type": "string" },
+          "retention": { "type": "string" },
+          "soe_decision_id": { "type": "string", "pattern": "^DEC-[0-9A-F]{8}$" },
+          "soe_why": {
+            "type": "object",
+            "properties": {
+              "rule_id": { "type": "string" },
+              "pack_id": { "type": "string" },
+              "citations": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      },
+      "description": "Evidence requirements derived from SOE decisions",
+      "default": []
+    },
     "eee_requirements": {
       "type": "object",
       "additionalProperties": false,

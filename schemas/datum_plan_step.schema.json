@@ -11,11 +11,12 @@
       "type": "string",
       "enum": [
         "FAB", "ASSEMBLY",
+        "SMT", "REFLOW",
         "CLEAN", "BAKE",
         "POLYMER", "CURE",
         "INSPECT", "TEST",
         "PROGRAM", "LEAD_FORM",
-        "SELECTIVE_SOLDER",
+        "SELECTIVE_SOLDER", "COAT",
         "PACK"
       ]
     },
@@ -39,6 +40,20 @@
       "type": "array",
       "minItems": 1,
       "items": { "$ref": "./datum_rule_ref.schema.json" }
+    },
+    "soe_decision_id": {
+      "type": "string",
+      "pattern": "^DEC-[0-9A-F]{8}$",
+      "description": "SOE decision ID that required this step (if SOE-enforced)"
+    },
+    "soe_why": {
+      "type": "object",
+      "description": "SOE justification for this step",
+      "properties": {
+        "rule_id": { "type": "string" },
+        "pack_id": { "type": "string" },
+        "citations": { "type": "array", "items": { "type": "string" } }
+      }
     }
   }
 }
