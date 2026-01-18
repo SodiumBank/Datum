@@ -1,0 +1,35 @@
+{
+  "profile_id": "IATF16949_DOMAIN",
+  "profile_type": "DOMAIN",
+  "name": "IATF 16949 Automotive Quality Management",
+  "version": "1.0.0",
+  "parent_profiles": ["BASE_IPC"],
+  "industry_domains": ["automotive"],
+  "source_standards": [
+    {
+      "standard_id": "IATF16949",
+      "clause": "8.5.1",
+      "section": "Control of Production and Service Provision"
+    },
+    {
+      "standard_id": "IATF16949",
+      "clause": "8.5.2",
+      "section": "Identification and Traceability"
+    }
+  ],
+  "standards_packs": [
+    "IATF16949_BASE",
+    "APQP_PPAP_CORE",
+    "SPC_CAPABILITY",
+    "LOT_TRACEABILITY_AUTOMOTIVE"
+  ],
+  "inheritance_rules": {
+    "override_mode": "ADDITIVE",
+    "conflict_resolution": "ERROR"
+  },
+  "metadata": {
+    "description": "IATF 16949 automotive quality management system requirements with APQP/PPAP and SPC",
+    "effective_date": "2026-01-01",
+    "maintained_by": "Datum Engineering"
+  }
+}

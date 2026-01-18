@@ -29,19 +29,34 @@
 
 ---
 
-## 🚧 In Progress (Sprint 6 Stories 4-6)
+## ✅ Story 5: Multi-Industry Standards Layer Model (IN PROGRESS)
 
-### Story 4: Profile Lifecycle Enforcement in Write Paths
-- **Status:** Partially complete
-- ✅ `_save_profile_with_state()` enforces immutability
-- ✅ `create_profile_version()` checks immutability before versioning
-- ⚠️ Need audit of all profile write paths (if any others exist)
+### Domain Profiles
+- ✅ `AS9100_DOMAIN.json` - Exists (aerospace/space)
+- ✅ `ISO13485_DOMAIN.json` - Exists (medical)
+- ✅ `IATF16949_DOMAIN.json` - Created (automotive)
+- All profiles inherit from `BASE_IPC` and reference appropriate standards packs
 
-### Story 5: Multi-Industry Standards Layer Model
+### Industry Profiles
+- ✅ `space.json` - Complete with default packs
+- ✅ `aerospace.json` - Complete with default packs
+- ✅ `medical.json` - Complete with default packs (references ISO13485_DOMAIN packs)
+- ✅ `automotive.json` - Complete with default packs (references IATF16949_DOMAIN packs)
+
+### Standards Packs Status
+- ✅ Space packs: AS9100_BASE, JSTD001_SPACE, NASA_POLYMERICS, SPACE_ENV_TESTS, FLIGHT_TRACEABILITY
+- ✅ Aerospace packs: AS9100_BASE, JSTD001_BASE, AEROSPACE_ENV_TESTS
+- ✅ Medical packs: ISO13485_BASE, FDA_QSR_820_CORE, IPC_WORKMANSHIP_BASE, PROCESS_VALIDATION_IQOQPQ, DHR_DMR_EVIDENCE_BUNDLE, LOT_TRACEABILITY_MEDICAL
+- ✅ Automotive packs: IATF16949_BASE, APQP_PPAP_CORE, SPC_CAPABILITY, LOT_TRACEABILITY_AUTOMOTIVE
+
+### Next Steps
+- ⚠️ Verify profile stack resolution works with new domain profiles
+- ⚠️ Test SOE runs with domain profiles to ensure packs resolve correctly
+
+## 🚧 Story 6: Audit Artifact Consistency Checks
 - **Status:** Not started
-- ⚠️ Need to create domain profiles for aerospace/medical/automotive
-- ⚠️ Update industry_profiles JSON files with default packs
-- ⚠️ Add starter standards packs per industry
+- ⚠️ Need to implement audit integrity checker
+- ⚠️ Add examples and documentation
 
 ### Story 6: Audit Artifact Consistency Checks
 - **Status:** Not started
