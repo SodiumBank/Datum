@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { apiClient } from "../../../lib/api";
 import { useErrorHandler } from "../../../lib/error-handler";
+import { useAuth } from "../../../lib/auth";
 
 /**
  * Plan Detail Page - View full plan details with editing capabilities (Sprint 8).
@@ -13,6 +14,7 @@ export default function PlanDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { handleApiError } = useErrorHandler();
+  const { canEdit: canUserEdit, canApprove } = useAuth();
   const planId = params.planId as string;
 
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -117,7 +119,7 @@ export default function PlanDetailPage() {
     );
   }
 
-  const canEdit = plan.state === "draft" && !plan.locked;
+  const canEdit = plan.state === "draft" && !plan.locked && canUserEdit();
 
   return (
     <main style={{ padding: 24, fontFamily: "ui-sans-serif, system-ui", maxWidth: 1200, margin: "0 auto" }}>
@@ -152,7 +154,7 @@ export default function PlanDetailPage() {
                 {editMode ? "Cancel Edit" : "Edit Plan"}
               </button>
             )}
-            {plan.state === "draft" && (
+            {plan.state === "draft" && canUserEdit() && (
               <button
                 onClick={handleSubmitForApproval}
                 disabled={loading}
@@ -167,6 +169,60 @@ export default function PlanDetailPage() {
               >
                 {loading ? "Submitting..." : "Submit for Approval"}
               </button>
+            )}
+            {plan.state === "submitted" && canApprove() && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      await apiClient.approvePlan(planId, "Approved from UI");
+                      await fetchPlan();
+                    } catch (err) {
+                      handleApiError(err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: loading ? "#ccc" : "#0a0",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: loading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {loading ? "Approving..." : "Approve"}
+                </button>
+                <button
+                  onClick={async () => {
+                    const reason = prompt("Rejection reason:");
+                    if (!reason) return;
+                    setLoading(true);
+                    try {
+                      await apiClient.rejectPlan(planId, reason);
+                      await fetchPlan();
+                    } catch (err) {
+                      handleApiError(err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: loading ? "#ccc" : "#c00",
+                    color: "white",
+                    border: "none",
+                    borderRadius: 4,
+                    cursor: loading ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {loading ? "Rejecting..." : "Reject"}
+                </button>
+              </div>
             )}
           </div>
         </div>
