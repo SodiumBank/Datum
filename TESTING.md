@@ -19,8 +19,15 @@ mkdir -p storage/uploads
 
 ### Unit Tests
 ```bash
+# From repo root (recommended - uses conftest.py for import resolution)
 pytest services/api/tests/ -v
+
+# Or from services/api directory
+cd services/api
+PYTHONPATH=../.. pytest tests/ -v
 ```
+
+**Note (Sprint 7):** Tests can now be run from repo root thanks to `services/api/conftest.py`, which adds the repo root to `sys.path` for `services` module imports.
 
 ### Contract Tests
 ```bash
