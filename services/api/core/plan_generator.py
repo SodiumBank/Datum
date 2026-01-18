@@ -1,5 +1,13 @@
-"""Datum Plan generator - generates deterministic plans from rules and quotes."""
+"""Datum Plan generator - generates deterministic plans from SOE + quotes.
 
+SPRINT 2: Manufacturing Intent Layer
+- Pure function: SOERun + Quote -> DatumPlan
+- Deterministic: Same inputs -> identical plan
+- Immutable: Plan cannot be edited post-generation
+- Traceable: Every step/test/evidence references SOE decisions
+"""
+
+import hashlib
 import secrets
 import string
 from datetime import datetime, timezone
@@ -18,7 +26,7 @@ from services.api.core.storage import (
 from services.api.core.schema_validation import validate_schema
 
 
-class PlanStep(TypedDict):
+class PlanStep(TypedDict, total=False):
     """Plan step structure."""
     step_id: str
     type: str
@@ -29,10 +37,21 @@ class PlanStep(TypedDict):
     parameters: Dict[str, Any] | None
     acceptance: Dict[str, Any] | None
     source_rules: List[Dict[str, Any]]
+    soe_decision_id: str  # Sprint 2: SOE decision reference
+    soe_why: Dict[str, Any]  # Sprint 2: SOE justification
+
+
+def _generate_deterministic_id(inputs: Dict[str, Any], prefix: str = "step") -> str:
+    """Generate deterministic ID from inputs (Sprint 2: for immutability)."""
+    # Hash inputs to create deterministic ID
+    input_str = f"{prefix}:{inputs.get('type')}:{inputs.get('sequence')}:{inputs.get('title')}"
+    hash_obj = hashlib.sha256(input_str.encode())
+    hash_hex = hash_obj.hexdigest()[:12]
+    return f"{prefix}_{hash_hex}"
 
 
 def _generate_id(prefix: str = "plan") -> str:
-    """Generate a unique ID."""
+    """Generate a unique ID (for plan-level IDs that need uniqueness)."""
     random_suffix = "".join(secrets.choice(string.ascii_lowercase + string.digits) for _ in range(12))
     return f"{prefix}_{random_suffix}"
 
@@ -62,13 +81,13 @@ def _generate_revision(existing_revisions: List[str]) -> str:
 
 
 def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
-    """Create default process steps for a quote."""
+    """Create default process steps for a quote (Sprint 2: canonical step types)."""
     steps: List[PlanStep] = []
     sequence = 1
     
     # PCB Fabrication
     steps.append({
-        "step_id": _generate_id("step"),
+        "step_id": _generate_deterministic_id({"type": "FAB", "sequence": sequence, "title": "PCB Fabrication"}),
         "type": "FAB",
         "title": "PCB Fabrication",
         "sequence": sequence,
@@ -87,9 +106,9 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
     assembly_sides = quote.get("assumptions", {}).get("assembly_sides", ["TOP"])
     if "TOP" in assembly_sides:
         steps.append({
-            "step_id": _generate_id("step"),
-            "type": "ASSEMBLY",
-            "title": "Top-side Assembly",
+            "step_id": _generate_deterministic_id({"type": "SMT", "sequence": sequence, "title": "Top-side SMT"}),
+            "type": "SMT",
+            "title": "Top-side SMT",
             "sequence": sequence,
             "required": True,
             "locked_sequence": False,
@@ -101,12 +120,25 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
             "source_rules": [],
         })
         sequence += 1
+        
+        steps.append({
+            "step_id": _generate_deterministic_id({"type": "REFLOW", "sequence": sequence, "title": "Top-side Reflow"}),
+            "type": "REFLOW",
+            "title": "Top-side Reflow",
+            "sequence": sequence,
+            "required": True,
+            "locked_sequence": False,
+            "parameters": {"side": "TOP"},
+            "acceptance": None,
+            "source_rules": [],
+        })
+        sequence += 1
     
     if "BOTTOM" in assembly_sides:
         steps.append({
-            "step_id": _generate_id("step"),
-            "type": "ASSEMBLY",
-            "title": "Bottom-side Assembly",
+            "step_id": _generate_deterministic_id({"type": "SMT", "sequence": sequence, "title": "Bottom-side SMT"}),
+            "type": "SMT",
+            "title": "Bottom-side SMT",
             "sequence": sequence,
             "required": True,
             "locked_sequence": False,
@@ -118,10 +150,23 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
             "source_rules": [],
         })
         sequence += 1
+        
+        steps.append({
+            "step_id": _generate_deterministic_id({"type": "REFLOW", "sequence": sequence, "title": "Bottom-side Reflow"}),
+            "type": "REFLOW",
+            "title": "Bottom-side Reflow",
+            "sequence": sequence,
+            "required": True,
+            "locked_sequence": False,
+            "parameters": {"side": "BOTTOM"},
+            "acceptance": None,
+            "source_rules": [],
+        })
+        sequence += 1
     
     # Final Inspection
     steps.append({
-        "step_id": _generate_id("step"),
+        "step_id": _generate_deterministic_id({"type": "INSPECT", "sequence": sequence, "title": "Final Inspection"}),
         "type": "INSPECT",
         "title": "Final Inspection",
         "sequence": sequence,
@@ -138,7 +183,7 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
     
     # Pack
     steps.append({
-        "step_id": _generate_id("step"),
+        "step_id": _generate_deterministic_id({"type": "PACK", "sequence": sequence, "title": "Packaging"}),
         "type": "PACK",
         "title": "Packaging",
         "sequence": sequence,
@@ -203,8 +248,9 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                 step_title = payload.get("title", step_type.replace("_", " ").title())
                 
                 sequence_counter += 1
+                step_inputs = {"type": step_type, "sequence": sequence_counter, "title": step_title}
                 new_step: PlanStep = {
-                    "step_id": _generate_id("step"),
+                    "step_id": _generate_deterministic_id(step_inputs),
                     "type": step_type,
                     "title": step_title,
                     "sequence": sequence_counter,
@@ -224,7 +270,7 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                 steps_to_lock = payload.get("steps", [])
                 lock_sequence = payload.get("lock_sequence", True)
                 
-                # Step type mapping for NASA polymerics
+                # Step type mapping for NASA polymerics (canonical types)
                 step_type_map = {
                     "CLEAN": "CLEAN",
                     "BAKE": "BAKE",
@@ -251,8 +297,9 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                     else:
                         # Add new step with locked sequence
                         sequence_counter += 1
+                        step_inputs = {"type": step_type, "sequence": sequence_counter, "title": step_name}
                         new_step: PlanStep = {
-                            "step_id": _generate_id("step"),
+                            "step_id": _generate_deterministic_id(step_inputs),
                             "type": step_type,
                             "title": step_name.replace("_", " ").title(),
                             "sequence": sequence_counter,
@@ -275,8 +322,9 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                 test_title = payload.get("title", test_type.replace("_", " ").title())
                 
                 sequence_counter += 1
+                step_inputs = {"type": "TEST", "sequence": sequence_counter, "title": test_title}
                 new_step: PlanStep = {
-                    "step_id": _generate_id("step"),
+                    "step_id": _generate_deterministic_id(step_inputs),
                     "type": "TEST",
                     "title": test_title,
                     "sequence": sequence_counter,
@@ -296,7 +344,7 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
 
 def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: List[PlanStep]) -> List[PlanStep]:
     """
-    Convert SOE decisions to plan steps (non-destructively).
+    Convert SOE decisions to plan steps (Sprint 2: with SOE decision references).
     
     SOE decisions with INSERT_STEP or REQUIRE actions for process_step/test
     are converted to plan steps, flagged as SOE-required.
@@ -326,16 +374,26 @@ def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: Lis
                 existing_step = step
                 break
         
+        # Build SOE why metadata
+        soe_why = {
+            "rule_id": decision["why"]["rule_id"],
+            "pack_id": decision["why"]["pack_id"],
+            "citations": decision["why"].get("citations", []),
+        }
+        
         if existing_step:
             # Mark existing step as SOE-required
             existing_step["required"] = True
             if decision.get("enforcement") == "BLOCK_RELEASE":
                 existing_step["locked_sequence"] = True
+            # Add SOE decision reference
+            existing_step["soe_decision_id"] = decision["id"]
+            existing_step["soe_why"] = soe_why
             # Add SOE source rule
             soe_rule_ref = {
                 "rule_id": decision["why"]["rule_id"],
                 "ruleset_version": 1,  # SOE ruleset version
-                "justification": f"SOE: {decision['why'].get('citations', [decision['why']['rule_id']])}",
+                "justification": f"SOE: {', '.join(decision['why'].get('citations', [decision['why']['rule_id']]))}",
             }
             if soe_rule_ref not in existing_step.get("source_rules", []):
                 existing_step["source_rules"].append(soe_rule_ref)
@@ -343,7 +401,7 @@ def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: Lis
             # Create new SOE-required step
             sequence_counter += 1
             
-            # Determine step type and title
+            # Determine step type and title (canonical step types)
             step_type_map = {
                 "CLEAN": "CLEAN",
                 "BAKE": "BAKE",
@@ -351,14 +409,17 @@ def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: Lis
                 "CURE": "CURE",
                 "INSPECT": "INSPECT",
                 "TVAC": "TEST",
+                "VIBRATION": "TEST",
+                "SHOCK": "TEST",
                 "XRAY": "TEST",
             }
             
             step_type = step_type_map.get(object_id, "ASSEMBLY" if object_type == "process_step" else "TEST")
             step_title = object_id.replace("_", " ").title()
             
+            step_inputs = {"type": step_type, "sequence": sequence_counter, "title": step_title}
             new_step: PlanStep = {
-                "step_id": _generate_id("step"),
+                "step_id": _generate_deterministic_id(step_inputs),
                 "type": step_type,
                 "title": step_title,
                 "sequence": sequence_counter,
@@ -366,37 +427,135 @@ def _convert_soe_decisions_to_steps(soe_run: Dict[str, Any], existing_steps: Lis
                 "locked_sequence": decision.get("enforcement") == "BLOCK_RELEASE",
                 "parameters": {"test_type": object_id} if step_type == "TEST" else None,
                 "acceptance": {
-                    "criteria": f"SOE requirement: {decision['why'].get('citations', [decision['why']['rule_id']])}",
+                    "criteria": f"SOE requirement: {', '.join(decision['why'].get('citations', [decision['why']['rule_id']]))}",
                     "sampling": "100_PERCENT",
                 } if step_type in ("TEST", "INSPECT") else None,
                 "source_rules": [{
                     "rule_id": decision["why"]["rule_id"],
                     "ruleset_version": 1,  # SOE ruleset
-                    "justification": f"SOE: {decision['why'].get('citations', [decision['why']['rule_id']])}",
+                    "justification": f"SOE: {', '.join(decision['why'].get('citations', [decision['why']['rule_id']]))}",
                 }],
+                "soe_decision_id": decision["id"],
+                "soe_why": soe_why,
             }
             new_steps.append(new_step)
     
     return new_steps
 
 
+def _generate_test_intent_from_soe(soe_run: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Generate test intent from SOE decisions (Sprint 2).
+    
+    Translates SOE test decisions into DatumPlan test sections.
+    """
+    test_intent: List[Dict[str, Any]] = []
+    decisions = soe_run.get("decisions", [])
+    
+    for decision in decisions:
+        action = decision.get("action")
+        object_type = decision.get("object_type")
+        
+        # Only process REQUIRE/INSERT_STEP actions for tests
+        if action not in ("REQUIRE", "INSERT_STEP"):
+            continue
+        
+        if object_type != "test":
+            continue
+        
+        test_type = decision.get("object_id")
+        soe_why = {
+            "rule_id": decision["why"]["rule_id"],
+            "pack_id": decision["why"]["pack_id"],
+            "citations": decision["why"].get("citations", []),
+        }
+        
+        test_intent.append({
+            "test_id": _generate_deterministic_id({"test_type": test_type, "decision_id": decision["id"]}, prefix="test"),
+            "test_type": test_type,
+            "title": test_type.replace("_", " ").title(),
+            "required": True,
+            "acceptance_criteria": f"SOE requirement: {', '.join(decision['why'].get('citations', [decision['why']['rule_id']]))}",
+            "soe_decision_id": decision["id"],
+            "soe_why": soe_why,
+        })
+    
+    return test_intent
+
+
+def _generate_evidence_intent_from_soe(soe_run: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Generate evidence intent from SOE required_evidence (Sprint 2).
+    
+    Translates SOE evidence requirements into DatumPlan evidence section with retention.
+    """
+    evidence_intent: List[Dict[str, Any]] = []
+    required_evidence = soe_run.get("required_evidence", [])
+    
+    for evidence_req in required_evidence:
+        evidence_type = evidence_req.get("evidence_type")
+        applies_to = evidence_req.get("applies_to")
+        object_id = evidence_req.get("object_id")
+        retention = evidence_req.get("retention", "STANDARD")
+        
+        # Try to find matching decision
+        matching_decision = None
+        for decision in soe_run.get("decisions", []):
+            if decision.get("object_type") == "evidence" and decision.get("object_id") == evidence_type:
+                matching_decision = decision
+                break
+        
+        if matching_decision:
+            soe_why = {
+                "rule_id": matching_decision["why"]["rule_id"],
+                "pack_id": matching_decision["why"]["pack_id"],
+                "citations": matching_decision["why"].get("citations", []),
+            }
+            decision_id = matching_decision["id"]
+        else:
+            # No matching decision, use generic SOE reference
+            soe_why = {
+                "rule_id": "SOE_EVIDENCE_REQUIREMENT",
+                "pack_id": soe_run.get("active_packs", [""])[0] if soe_run.get("active_packs") else "",
+                "citations": [],
+            }
+            decision_id = f"DEC-EVIDENCE-{evidence_type}"
+        
+        evidence_intent.append({
+            "evidence_id": _generate_deterministic_id({"evidence_type": evidence_type, "object_id": object_id}, prefix="evidence"),
+            "evidence_type": evidence_type,
+            "applies_to": applies_to,
+            "object_id": object_id,
+            "retention": retention,
+            "soe_decision_id": decision_id,
+            "soe_why": soe_why,
+        })
+    
+    return evidence_intent
+
+
 def generate_plan(
     quote_id: str,
+    soe_run: Dict[str, Any] | None = None,
     ruleset_version: int = 1,
     org_id: str | None = None,
     design_id: str | None = None,
 ) -> Dict[str, Any]:
     """
-    Generate a DatumPlan from a quote and ruleset.
+    Generate a DatumPlan from SOERun + quote as a pure function.
+    
+    SPRINT 2: This is a deterministic intent generator - NO edits, NO overrides.
+    DatumPlan is immutable once generated and traceable back to SOE decisions.
     
     Args:
         quote_id: ID of the quote to generate plan from
+        soe_run: SOERun object (if None, will try to load from storage)
         ruleset_version: Version of ruleset to use
         org_id: Organization ID (defaults to quote's org_id)
         design_id: Design ID (defaults to quote's design_id)
     
     Returns:
-        DatumPlan object
+        DatumPlan object with SOE decision references
     """
     # Load quote
     quote = get_quote(quote_id)
@@ -447,11 +606,31 @@ def generate_plan(
     rule_steps = _convert_rule_actions_to_steps(traces, steps)
     steps.extend(rule_steps)
     
-    # Inject SOE-enforced steps if SOERun exists
-    soe_run = get_soe_run(quote_id=quote_id)
+    # Load SOERun if not provided
+    if not soe_run:
+        soe_run = get_soe_run(quote_id=quote_id)
+    
+    # Collect SOE decision IDs for plan metadata
+    soe_decision_ids: List[str] = []
+    soe_run_id: str | None = None
+    
     if soe_run:
+        soe_run_id = soe_run.get("id") or f"soe_run_{quote_id}"
+        decisions = soe_run.get("decisions", [])
+        soe_decision_ids = [d["id"] for d in decisions if "id" in d]
+        
+        # Inject SOE-enforced steps
         soe_steps = _convert_soe_decisions_to_steps(soe_run, steps)
         steps.extend(soe_steps)
+        
+        # Generate test intent from SOE
+        test_intent = _generate_test_intent_from_soe(soe_run)
+        
+        # Generate evidence intent from SOE
+        evidence_intent = _generate_evidence_intent_from_soe(soe_run)
+    else:
+        test_intent = []
+        evidence_intent = []
     
     # Sort steps by sequence
     steps.sort(key=lambda s: s["sequence"])
@@ -474,7 +653,7 @@ def generate_plan(
     # Create timestamp
     timestamp = datetime.now(timezone.utc).isoformat()
     
-    # Build plan payload
+    # Build plan payload (SPRINT 2: Immutable intent layer)
     plan: Dict[str, Any] = {
         "id": plan_id,
         "org_id": org_id,
@@ -489,9 +668,16 @@ def generate_plan(
             "ruleset_version": ruleset_version,
         },
         "steps": steps,
+        "tests": test_intent,
+        "evidence_intent": evidence_intent,
         "created_at": timestamp,
         "updated_at": timestamp,
     }
+    
+    # Add SOE references if SOERun was used
+    if soe_run:
+        plan["soe_run_id"] = soe_run_id
+        plan["soe_decision_ids"] = soe_decision_ids
     
     # Validate against schema
     try:

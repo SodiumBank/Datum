@@ -78,7 +78,7 @@ def get_plan_endpoint(
     plan_id: str,
     auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
 ):
-    """Get a specific plan by ID."""
+    """Get a specific plan by ID (Sprint 2: read-only intent layer)."""
     plan = get_plan(plan_id)
     if not plan:
         raise HTTPException(
@@ -86,6 +86,23 @@ def get_plan_endpoint(
             detail=f"Plan not found: {plan_id}",
         )
     return plan
+
+
+@router.get("/quote/{quote_id}")
+def get_plan_by_quote_endpoint(
+    quote_id: str,
+    auth: dict = Depends(require_role("CUSTOMER", "OPS", "ADMIN")),
+):
+    """Get plan by quote ID (Sprint 2: read-only intent layer)."""
+    plans = list_plans(quote_id=quote_id)
+    if not plans:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Plan not found for quote: {quote_id}",
+        )
+    # Return most recent plan
+    plans.sort(key=lambda p: p.get("created_at", ""), reverse=True)
+    return plans[0]
 
 
 @router.get("")
@@ -99,7 +116,7 @@ def list_plans_endpoint(
 
 
 class UpdatePlanStepsRequest(BaseModel):
-    """Request model for updating plan steps."""
+    """Request model for updating plan steps (Sprint 2: NOT ALLOWED)."""
     steps: list[dict]
     override_reason: str | None = None
 
@@ -111,10 +128,19 @@ def update_plan_steps(
     auth: dict = Depends(require_role("OPS", "ADMIN")),
 ):
     """
-    Update plan steps with validation for locked sequences.
+    Update plan steps (Sprint 2: NOT ALLOWED - Plans are immutable).
     
-    Locked steps cannot be reordered without an override reason and audit event.
+    SPRINT 2 GUARDRAIL: DatumPlan is read-only intent layer.
+    No edits, no overrides, no mutations.
+    This endpoint returns 403 in Sprint 2.
     """
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=(
+            "Sprint 2: DatumPlan is immutable. "
+            "Mutations are not allowed. Create a new revision in Sprint 3+."
+        ),
+    )
     plan = get_plan(plan_id)
     if not plan:
         raise HTTPException(

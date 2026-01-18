@@ -1,0 +1,267 @@
+{
+  "id": "plan_example_space_flight",
+  "org_id": "org_example_001",
+  "design_id": "design_example_001",
+  "revision_id": "rev_example_001",
+  "quote_id": "quote_example_001",
+  "quote_version": 1,
+  "plan_revision": "A",
+  "locked": false,
+  "derived_from_ruleset": {
+    "ruleset_id": "ruleset_default",
+    "ruleset_version": 1
+  },
+  "soe_run_id": "soe_run_space_flight_001",
+  "soe_decision_ids": [
+    "DEC-12345678",
+    "DEC-87654321"
+  ],
+  "steps": [
+    {
+      "step_id": "step_fab_001",
+      "type": "FAB",
+      "title": "PCB Fabrication",
+      "sequence": 1,
+      "required": true,
+      "locked_sequence": false,
+      "parameters": null,
+      "acceptance": {
+        "criteria": "IPC-A-600 Class 3",
+        "sampling": "100_PERCENT"
+      },
+      "source_rules": []
+    },
+    {
+      "step_id": "step_smt_top_001",
+      "type": "SMT",
+      "title": "Top-side SMT",
+      "sequence": 2,
+      "required": true,
+      "locked_sequence": false,
+      "parameters": {
+        "side": "TOP"
+      },
+      "acceptance": {
+        "criteria": "IPC-A-610 Class 3",
+        "sampling": "100_PERCENT"
+      },
+      "source_rules": []
+    },
+    {
+      "step_id": "step_reflow_top_001",
+      "type": "REFLOW",
+      "title": "Top-side Reflow",
+      "sequence": 3,
+      "required": true,
+      "locked_sequence": false,
+      "parameters": {
+        "side": "TOP"
+      },
+      "acceptance": null,
+      "source_rules": []
+    },
+    {
+      "step_id": "step_clean_001",
+      "type": "CLEAN",
+      "title": "Clean",
+      "sequence": 4,
+      "required": true,
+      "locked_sequence": true,
+      "parameters": null,
+      "acceptance": null,
+      "source_rules": [
+        {
+          "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+          "ruleset_version": 1,
+          "justification": "SOE: NASA-STD-8739.1"
+        }
+      ],
+      "soe_decision_id": "DEC-87654321",
+      "soe_why": {
+        "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+        "pack_id": "NASA_POLYMERICS",
+        "citations": ["NASA-STD-8739.1"]
+      }
+    },
+    {
+      "step_id": "step_bake_001",
+      "type": "BAKE",
+      "title": "Bake",
+      "sequence": 5,
+      "required": true,
+      "locked_sequence": true,
+      "parameters": null,
+      "acceptance": null,
+      "source_rules": [
+        {
+          "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+          "ruleset_version": 1,
+          "justification": "SOE: NASA-STD-8739.1"
+        }
+      ],
+      "soe_decision_id": "DEC-87654321",
+      "soe_why": {
+        "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+        "pack_id": "NASA_POLYMERICS",
+        "citations": ["NASA-STD-8739.1"]
+      }
+    },
+    {
+      "step_id": "step_polymer_001",
+      "type": "POLYMER",
+      "title": "Polymer",
+      "sequence": 6,
+      "required": true,
+      "locked_sequence": true,
+      "parameters": null,
+      "acceptance": null,
+      "source_rules": [
+        {
+          "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+          "ruleset_version": 1,
+          "justification": "SOE: NASA-STD-8739.1"
+        }
+      ],
+      "soe_decision_id": "DEC-87654321",
+      "soe_why": {
+        "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+        "pack_id": "NASA_POLYMERICS",
+        "citations": ["NASA-STD-8739.1"]
+      }
+    },
+    {
+      "step_id": "step_cure_001",
+      "type": "CURE",
+      "title": "Cure",
+      "sequence": 7,
+      "required": true,
+      "locked_sequence": true,
+      "parameters": null,
+      "acceptance": null,
+      "source_rules": [
+        {
+          "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+          "ruleset_version": 1,
+          "justification": "SOE: NASA-STD-8739.1"
+        }
+      ],
+      "soe_decision_id": "DEC-87654321",
+      "soe_why": {
+        "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+        "pack_id": "NASA_POLYMERICS",
+        "citations": ["NASA-STD-8739.1"]
+      }
+    },
+    {
+      "step_id": "step_inspect_001",
+      "type": "INSPECT",
+      "title": "Inspect",
+      "sequence": 8,
+      "required": true,
+      "locked_sequence": true,
+      "parameters": null,
+      "acceptance": {
+        "criteria": "SOE requirement: NASA-STD-8739.1",
+        "sampling": "100_PERCENT"
+      },
+      "source_rules": [
+        {
+          "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+          "ruleset_version": 1,
+          "justification": "SOE: NASA-STD-8739.1"
+        }
+      ],
+      "soe_decision_id": "DEC-87654321",
+      "soe_why": {
+        "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+        "pack_id": "NASA_POLYMERICS",
+        "citations": ["NASA-STD-8739.1"]
+      }
+    },
+    {
+      "step_id": "step_inspect_final_001",
+      "type": "INSPECT",
+      "title": "Final Inspection",
+      "sequence": 9,
+      "required": true,
+      "locked_sequence": false,
+      "parameters": null,
+      "acceptance": {
+        "criteria": "Visual inspection per IPC-A-610",
+        "sampling": "100_PERCENT"
+      },
+      "source_rules": []
+    },
+    {
+      "step_id": "step_tvac_001",
+      "type": "TEST",
+      "title": "Tvac",
+      "sequence": 10,
+      "required": true,
+      "locked_sequence": true,
+      "parameters": {
+        "test_type": "TVAC"
+      },
+      "acceptance": {
+        "criteria": "SOE requirement: NASA_GEVS, AS9100_8_5_1",
+        "sampling": "100_PERCENT"
+      },
+      "source_rules": [
+        {
+          "rule_id": "SPACE.TEST.TVAC.FLIGHT",
+          "ruleset_version": 1,
+          "justification": "SOE: NASA_GEVS, AS9100_8_5_1"
+        }
+      ],
+      "soe_decision_id": "DEC-12345678",
+      "soe_why": {
+        "rule_id": "SPACE.TEST.TVAC.FLIGHT",
+        "pack_id": "SPACE_ENV_TESTS",
+        "citations": ["NASA_GEVS", "AS9100_8_5_1"]
+      }
+    },
+    {
+      "step_id": "step_pack_001",
+      "type": "PACK",
+      "title": "Packaging",
+      "sequence": 11,
+      "required": true,
+      "locked_sequence": false,
+      "parameters": null,
+      "acceptance": null,
+      "source_rules": []
+    }
+  ],
+  "tests": [
+    {
+      "test_id": "test_tvac_001",
+      "test_type": "TVAC",
+      "title": "Tvac",
+      "required": true,
+      "acceptance_criteria": "SOE requirement: NASA_GEVS, AS9100_8_5_1",
+      "soe_decision_id": "DEC-12345678",
+      "soe_why": {
+        "rule_id": "SPACE.TEST.TVAC.FLIGHT",
+        "pack_id": "SPACE_ENV_TESTS",
+        "citations": ["NASA_GEVS", "AS9100_8_5_1"]
+      }
+    }
+  ],
+  "evidence_intent": [
+    {
+      "evidence_id": "evidence_coa_001",
+      "evidence_type": "COA",
+      "applies_to": "material",
+      "object_id": "EPOXY_3M_SCOTCHWELD_2216",
+      "retention": "LIFE_OF_PROGRAM",
+      "soe_decision_id": "DEC-EVIDENCE-COA",
+      "soe_why": {
+        "rule_id": "AS9100.EVIDENCE.COA.REQUIRED",
+        "pack_id": "AS9100_BASE",
+        "citations": ["AS9100_8.5.1"]
+      }
+    }
+  ],
+  "created_at": "2026-01-18T00:00:00Z",
+  "updated_at": "2026-01-18T00:00:00Z"
+}
