@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r services/api/requirements.txt
+      - name: Lint
+        run: |
+          ruff check services/api
+          ruff format --check services/api
+      - name: Unit tests
+        run: |
+          cd services/api
+          pytest -q tests/
+      - name: Schema validation tests
+        run: |
+          python services/api/scripts/validate_schemas.py
+      - name: Contract tests
+        run: |
+          cd services/api
+          PYTHONPATH=../.. python scripts/agent_contract_tests.py
+      - name: End-to-end tests
+        run: |
+          cd services/api
+          PYTHONPATH=../.. python scripts/e2e_test.py
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & build web
+        working-directory: apps/web
+        run: |
+          npm install
+          npm run build
+
+  ops:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install & build ops
+        working-directory: apps/ops
+        run: |
+          npm install
+          npm run build

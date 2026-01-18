@@ -1,0 +1,8 @@
+{
+  "pack_id": "IPC_WORKMANSHIP_BASE",
+  "name": "IPC Workmanship Base",
+  "industry_profiles": ["medical", "industrial"],
+  "description": "IPC workmanship standards (enforcement varies by industry)",
+  "references": ["IPC_A_610"],
+  "rules": []
+}

@@ -1,0 +1,8 @@
+{
+  "pack_id": "DHR_DMR_EVIDENCE_BUNDLE",
+  "name": "DHR/DMR Evidence Bundle",
+  "industry_profiles": ["medical"],
+  "description": "Device History Record and Device Master Record evidence requirements",
+  "references": ["FDA_21_CFR_820_184", "ISO_13485_4.2.4"],
+  "rules": []
+}

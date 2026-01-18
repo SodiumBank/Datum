@@ -1,0 +1,16 @@
+{
+  "industry_profile": "space",
+  "default_packs": [
+    "AS9100_BASE",
+    "JSTD001_SPACE",
+    "NASA_POLYMERICS",
+    "SPACE_ENV_TESTS",
+    "FLIGHT_TRACEABILITY"
+  ],
+  "risk_posture": "max_rigor",
+  "defaults": {
+    "evidence_retention": "LIFE_OF_PROGRAM",
+    "traceability_depth": "unit_serialized",
+    "approval_gates": ["DESIGN_REVIEW", "PROCESS_REVIEW", "EVIDENCE_REVIEW", "RELEASE"]
+  }
+}

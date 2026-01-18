@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "datum://schemas/rule.schema.json",
+  "title": "Datum SOE Rule",
+  "type": "object",
+  "required": ["rule_id", "pack_id", "applies", "target", "when", "then", "why"],
+  "properties": {
+    "rule_id": { "type": "string", "pattern": "^[A-Z0-9_.-]+$" },
+    "pack_id": { "type": "string" },
+    "applies": {
+      "type": "object",
+      "required": ["industry_profiles"],
+      "properties": {
+        "industry_profiles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "hardware_classes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "required": ["object_type"],
+      "properties": {
+        "object_type": {
+          "type": "string",
+          "enum": ["process_step", "test", "evidence", "material", "bom_item", "release_gate", "document"]
+        },
+        "selector": {
+          "type": "object",
+          "description": "Optional filters to match a specific target (e.g., test=TVAC, process=CONFORMAL_COAT).",
+          "additionalProperties": { "type": ["string", "number", "boolean"] }
+        }
+      },
+      "additionalProperties": false
+    },
+    "when": {
+      "type": "object",
+      "description": "Boolean conditions evaluated against project/context inputs.",
+      "properties": {
+        "all": { "type": "array", "items": { "$ref": "./rule_expr.schema.json" } },
+        "any": { "type": "array", "items": { "$ref": "./rule_expr.schema.json" } },
+        "none": { "type": "array", "items": { "$ref": "./rule_expr.schema.json" } }
+      },
+      "additionalProperties": false
+    },
+    "then": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["REQUIRE", "OPTIONAL", "PROHIBIT", "INSERT_STEP", "ESCALATE", "SET_RETENTION", "ADD_COST_MODIFIER", "ADD_GATE"]
+        },
+        "enforcement": {
+          "type": "string",
+          "enum": ["NONE", "WARN", "BLOCK_RELEASE", "REQUIRE_APPROVAL"]
+        },
+        "payload": {
+          "type": "object",
+          "description": "Action-specific payload (e.g., inserted step template, evidence requirement, cost modifier).",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "why": {
+      "type": "object",
+      "required": ["summary"],
+      "properties": {
+        "summary": { "type": "string" },
+        "citations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "version": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

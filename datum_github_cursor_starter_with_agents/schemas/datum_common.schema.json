@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_common.schema.json",
+  "title": "Datum Common Types",
+  "type": "object",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_\\-]{8,64}$"
+    },
+    "isoTimestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "TIER_1",
+        "TIER_2",
+        "TIER_3"
+      ]
+    },
+    "complianceMode": {
+      "type": "string",
+      "enum": [
+        "COMMERCIAL",
+        "AEROSPACE",
+        "NASA"
+      ]
+    },
+    "side": {
+      "type": "string",
+      "enum": [
+        "TOP",
+        "BOTTOM"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "INFO",
+        "LOW",
+        "MEDIUM",
+        "HIGH",
+        "CRITICAL"
+      ]
+    },
+    "currencyCode": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$"
+    },
+    "unit": {
+      "type": "string",
+      "enum": [
+        "mm",
+        "mil",
+        "in"
+      ]
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000
+    },
+    "percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "money": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "currency"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "currency": {
+          "$ref": "#/$defs/currencyCode"
+        }
+      }
+    },
+    "humanRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 256
+        }
+      }
+    },
+    "assumptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "board_thickness_mm": {
+          "type": "number",
+          "minimum": 0.2,
+          "maximum": 6.0
+        },
+        "surface_finish": {
+          "type": "string",
+          "enum": [
+            "ENIG",
+            "HASL_LEADFREE",
+            "HASL_SN63",
+            "OSP",
+            "IMM_SILVER",
+            "IMM_TIN",
+            "HARD_GOLD"
+          ]
+        },
+        "ipc_class": {
+          "type": "string",
+          "enum": [
+            "CLASS_2",
+            "CLASS_3",
+            "CLASS_3A"
+          ]
+        },
+        "soldermask_color": {
+          "type": "string",
+          "enum": [
+            "GREEN",
+            "BLACK",
+            "RED",
+            "BLUE",
+            "WHITE",
+            "YELLOW",
+            "PURPLE",
+            "NONE"
+          ]
+        },
+        "silkscreen_color": {
+          "type": "string",
+          "enum": [
+            "WHITE",
+            "BLACK",
+            "NONE"
+          ]
+        },
+        "copper_oz_outer": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 6.0
+        },
+        "copper_oz_inner": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 6.0
+        },
+        "controlled_impedance": {
+          "type": "boolean"
+        },
+        "assembly_sides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/side"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

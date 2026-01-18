@@ -1,0 +1,8 @@
+{
+  "pack_id": "JSTD001_BASE",
+  "name": "IPC J-STD-001 Base",
+  "industry_profiles": ["aerospace"],
+  "description": "IPC J-STD-001 workmanship requirements for aerospace",
+  "references": ["IPC_J_STD_001"],
+  "rules": []
+}

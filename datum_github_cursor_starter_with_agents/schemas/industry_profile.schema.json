@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "datum://schemas/industry_profile.schema.json",
+  "title": "Datum Industry Profile",
+  "type": "object",
+  "required": ["industry_profile", "default_packs", "risk_posture", "defaults"],
+  "properties": {
+    "industry_profile": { "type": "string", "enum": ["space", "aerospace", "medical", "automotive", "industrial"] },
+    "default_packs": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "risk_posture": { "type": "string", "enum": ["max_rigor", "high", "medium", "low"] },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "evidence_retention": { "type": "string" },
+        "traceability_depth": { "type": "string", "enum": ["unit_serialized", "lot_based", "batch_based"] },
+        "approval_gates": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

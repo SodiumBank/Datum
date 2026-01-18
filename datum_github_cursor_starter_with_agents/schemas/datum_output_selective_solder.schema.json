@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_output_selective_solder.schema.json",
+  "title": "Datum Output: SELECTIVE_SOLDER",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["units", "sites"],
+  "properties": {
+    "units": { "$ref": "./datum_common.schema.json#/$defs/unit" },
+    "sites": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["refdes", "hole_map", "risk"],
+        "properties": {
+          "refdes": { "type": "string", "maxLength": 32 },
+          "hole_map": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["hole_id", "x", "y", "finished_hole_mm"],
+              "properties": {
+                "hole_id": { "type": "string", "maxLength": 64 },
+                "x": { "type": "number" },
+                "y": { "type": "number" },
+                "finished_hole_mm": { "type": "number", "minimum": 0.1, "maximum": 10.0 },
+                "pin_diameter_mm": { "type": "number", "minimum": 0.05, "maximum": 9.0 },
+                "clearance_mm": { "type": "number", "minimum": 0, "maximum": 5.0 }
+              }
+            }
+          },
+          "masking_required": { "type": "boolean", "default": false },
+          "risk": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["thermal_mass", "shadowing"],
+            "properties": {
+              "thermal_mass": { "$ref": "./datum_common.schema.json#/$defs/severity" },
+              "shadowing": { "$ref": "./datum_common.schema.json#/$defs/severity" },
+              "adjacent_smt_risk": { "$ref": "./datum_common.schema.json#/$defs/severity" }
+            }
+          },
+          "notes": { "type": "string", "maxLength": 512 }
+        }
+      }
+    }
+  }
+}

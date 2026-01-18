@@ -1,0 +1,94 @@
+{
+  "ruleset_version": 1,
+  "description": "Datum Ruleset v1 - Initial rule set for Tier 1 and Tier 2",
+  "rules": [
+    {
+      "rule_id": "PROC-001",
+      "category": "PROCESS",
+      "tier_required": "TIER_2",
+      "severity": "HIGH",
+      "trigger": "assumptions.compliance_mode == 'NASA' OR assumptions.coating_required == True OR assumptions.staking_required == True",
+      "actions": [
+        {
+          "type": "LOCK_SEQUENCE",
+          "payload": {
+            "steps": ["CLEAN", "BAKE", "POLYMER", "CURE", "INSPECT"],
+            "lock_sequence": true
+          }
+        }
+      ],
+      "justification": "NASA-STD-8739.1 polymerics requirements; clean before staking/coating; bake after clean; inspect after cure"
+    },
+    {
+      "rule_id": "TEST-001",
+      "category": "TEST",
+      "tier_required": "TIER_2",
+      "severity": "MEDIUM",
+      "trigger": "__value_in__('BGA', bom_items.packages) OR __value_in__('QFN', bom_items.packages)",
+      "actions": [
+        {
+          "type": "ADD_TEST",
+          "payload": {
+            "test_type": "XRAY",
+            "reason": "Hidden solder joints require inspection"
+          }
+        }
+      ],
+      "justification": "Hidden solder joints require inspection"
+    },
+    {
+      "rule_id": "SUPPLY-001",
+      "category": "SUPPLY",
+      "tier_required": "TIER_1",
+      "severity": "MEDIUM",
+      "trigger": "bom_items.max_lead_time_weeks >= 26 OR bom_items.has_eee == True",
+      "actions": [
+        {
+          "type": "ADD_RISK",
+          "payload": {
+            "risk_code": "LONG_LEAD",
+            "severity": "MEDIUM",
+            "summary": "Long-lead time parts or EEE components require inventory carry and full cert traceability"
+          }
+        }
+      ],
+      "justification": "Long-lead time parts (>=26 weeks) or EEE components require inventory carry and full cert traceability; optionally declare A/B lot testing"
+    },
+    {
+      "rule_id": "DFM-001",
+      "category": "DFM",
+      "tier_required": "TIER_1",
+      "severity": "LOW",
+      "trigger": "board_metrics.layers >= 6",
+      "actions": [
+        {
+          "type": "ADD_COST",
+          "payload": {
+            "cost_code": "MULTILAYER_PREMIUM",
+            "amount_per_unit": 5.0,
+            "reason": "Additional cost for 6+ layer boards"
+          }
+        }
+      ],
+      "justification": "6+ layer boards require additional processing steps and have higher material costs"
+    },
+    {
+      "rule_id": "DRC-001",
+      "category": "DRC",
+      "tier_required": "TIER_1",
+      "severity": "HIGH",
+      "trigger": "board_metrics.min_drill_to_copper_clearance_mm < 0.127",
+      "actions": [
+        {
+          "type": "ADD_RISK",
+          "payload": {
+            "risk_code": "DRILL_CLEARANCE",
+            "severity": "HIGH",
+            "summary": "Drill-to-copper clearance below IPC minimum (0.127mm)"
+          }
+        }
+      ],
+      "justification": "IPC-A-600 minimum drill-to-copper clearance is 0.127mm (5 mils)"
+    }
+  ]
+}

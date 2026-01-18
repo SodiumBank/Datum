@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "datum://schemas/rule_expr.schema.json",
+  "title": "Datum SOE Rule Expression",
+  "type": "object",
+  "description": "Boolean expression for rule conditions.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["field", "operator", "value"],
+      "properties": {
+        "field": { "type": "string" },
+        "operator": {
+          "type": "string",
+          "enum": ["equals", "not_equals", "contains", "not_contains", "gt", "gte", "lt", "lte", "in", "not_in"]
+        },
+        "value": { "type": ["string", "number", "boolean", "array"] }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["all"],
+      "properties": {
+        "all": {
+          "type": "array",
+          "items": { "$ref": "#" },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["any"],
+      "properties": {
+        "any": {
+          "type": "array",
+          "items": { "$ref": "#" },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["none"],
+      "properties": {
+        "none": {
+          "type": "array",
+          "items": { "$ref": "#" },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

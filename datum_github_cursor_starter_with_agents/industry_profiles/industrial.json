@@ -1,0 +1,12 @@
+{
+  "industry_profile": "industrial",
+  "default_packs": [
+    "IPC_WORKMANSHIP_BASE"
+  ],
+  "risk_posture": "medium",
+  "defaults": {
+    "evidence_retention": "5_YEARS",
+    "traceability_depth": "batch_based",
+    "approval_gates": ["RELEASE"]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/index.schema.json",
+  "title": "Datum Schemas Index",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "./datum_org.schema.json" },
+    { "$ref": "./datum_project.schema.json" },
+    { "$ref": "./datum_design_package.schema.json" },
+    { "$ref": "./datum_quote.schema.json" },
+    { "$ref": "./datum_plan.schema.json" },
+    { "$ref": "./datum_tests.schema.json" },
+    { "$ref": "./datum_outputs.schema.json" },
+    { "$ref": "./datum_revision.schema.json" },
+    { "$ref": "./datum_lock.schema.json" },
+    { "$ref": "./datum_audit_event.schema.json" },
+    { "$ref": "./datum_rule.schema.json" }
+  ]
+}

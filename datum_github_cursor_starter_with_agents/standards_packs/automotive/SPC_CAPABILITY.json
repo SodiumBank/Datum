@@ -1,0 +1,8 @@
+{
+  "pack_id": "SPC_CAPABILITY",
+  "name": "Statistical Process Control Capability",
+  "industry_profiles": ["automotive"],
+  "description": "SPC capability requirements for automotive manufacturing",
+  "references": ["IATF_16949_9.1.1"],
+  "rules": []
+}

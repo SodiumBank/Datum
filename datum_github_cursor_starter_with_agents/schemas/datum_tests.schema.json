@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_tests.schema.json",
+  "title": "DatumTests (Declared Verification Intent)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "revision_id", "plan_id", "plan_revision", "declared_tests"],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "revision_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "plan_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "plan_revision": { "type": "string", "pattern": "^[A-Z]{1,2}$" },
+    "declared_tests": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["test_code", "category", "required", "parameters", "acceptance"],
+        "properties": {
+          "test_code": {
+            "type": "string",
+            "enum": [
+              "ICT", "FCT", "PROGRAM_VERIFY",
+              "AOI", "XRAY",
+              "THERMAL_CYCLE", "TVAC",
+              "VIBRATION_SINE", "VIBRATION_RANDOM",
+              "SHOCK", "DROP",
+              "BURN_IN",
+              "HALT", "HASS"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "enum": ["ELECTRICAL", "INSPECTION", "ENVIRONMENTAL", "MECHANICAL", "RELIABILITY"]
+          },
+          "required": { "type": "boolean" },
+          "parameters": { "type": "object", "additionalProperties": true },
+          "acceptance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["criteria"],
+            "properties": {
+              "criteria": { "type": "string", "maxLength": 2048 },
+              "retest_policy": {
+                "type": "string",
+                "enum": ["NONE", "ONCE", "UNTIL_PASS_WITHIN_LIMITS"],
+                "default": "ONCE"
+              }
+            }
+          },
+          "source_rules": {
+            "type": "array",
+            "items": { "$ref": "./datum_rule_ref.schema.json" }
+          }
+        }
+      }
+    }
+  }
+}

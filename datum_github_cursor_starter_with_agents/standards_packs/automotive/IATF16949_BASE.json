@@ -1,0 +1,8 @@
+{
+  "pack_id": "IATF16949_BASE",
+  "name": "IATF 16949 Base Requirements",
+  "industry_profiles": ["automotive"],
+  "description": "IATF 16949 automotive quality management system requirements",
+  "references": ["IATF_16949"],
+  "rules": []
+}

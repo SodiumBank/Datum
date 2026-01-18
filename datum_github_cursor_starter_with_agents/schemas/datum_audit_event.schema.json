@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_audit_event.schema.json",
+  "title": "DatumAuditEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "entity_type", "entity_id", "action", "user_id", "timestamp"],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "entity_type": { "type": "string", "enum": ["DATUM_QUOTE", "DATUM_PLAN", "DATUM_TESTS", "DATUM_OUTPUTS", "DATUM_RULES"] },
+    "entity_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "action": { "type": "string", "enum": ["CREATE", "UPDATE", "LOCK", "UNLOCK", "OVERRIDE", "NEW_REVISION"] },
+    "reason": { "type": "string", "maxLength": 2048 },
+    "delta": { "type": "object", "additionalProperties": true },
+    "user_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "timestamp": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+  }
+}

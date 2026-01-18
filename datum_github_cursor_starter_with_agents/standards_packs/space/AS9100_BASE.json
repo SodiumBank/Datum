@@ -1,0 +1,8 @@
+{
+  "pack_id": "AS9100_BASE",
+  "name": "AS9100 Base Requirements",
+  "industry_profiles": ["space", "aerospace"],
+  "description": "AS9100 quality management system requirements for aviation, space, and defense",
+  "references": ["AS9100"],
+  "rules": []
+}

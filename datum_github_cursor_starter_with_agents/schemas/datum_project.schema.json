@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_project.schema.json",
+  "title": "Datum Project",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "org_id", "name", "created_at"],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "org_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "description": { "type": "string", "maxLength": 2048 },
+    "created_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+    "updated_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+  }
+}

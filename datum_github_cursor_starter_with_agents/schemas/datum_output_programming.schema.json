@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_output_programming.schema.json",
+  "title": "Datum Output: PROGRAMMING",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["devices", "method", "verification"],
+  "properties": {
+    "method": {
+      "type": "string",
+      "enum": ["ISP", "JTAG", "BED_OF_NAILS", "PREPROGRAMMED", "SWD", "UART_BOOTLOADER"]
+    },
+    "devices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["refdes", "device_type"],
+        "properties": {
+          "refdes": { "type": "string", "maxLength": 32 },
+          "device_type": { "type": "string", "enum": ["MCU", "FPGA", "EEPROM", "FLASH", "OTHER"] },
+          "interface": { "type": "string", "maxLength": 64 },
+          "firmware": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["artifact_sha256"],
+            "properties": {
+              "artifact_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+              "version": { "type": "string", "maxLength": 64 },
+              "label": { "type": "string", "maxLength": 128 }
+            }
+          },
+          "serial_number_binding": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["readback", "acceptance"],
+      "properties": {
+        "readback": { "type": "boolean", "default": true },
+        "acceptance": { "type": "string", "maxLength": 1024 },
+        "retries": { "type": "integer", "minimum": 0, "maximum": 10, "default": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_revision.schema.json",
+  "title": "DatumRevision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "org_id", "design_id", "created_at", "reason"],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "org_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "design_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "created_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+    "created_by": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 512 }
+  }
+}

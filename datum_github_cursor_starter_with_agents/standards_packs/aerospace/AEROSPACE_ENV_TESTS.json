@@ -1,0 +1,53 @@
+{
+  "pack_id": "AEROSPACE_ENV_TESTS",
+  "name": "Aerospace Environmental Tests",
+  "industry_profiles": ["aerospace"],
+  "description": "Environmental test requirements for aerospace hardware (reduced from space)",
+  "references": ["AS9100_8.5.1"],
+  "rules": [
+    {
+      "rule_id": "AERO.TEST.TVAC.OPTIONAL",
+      "applies": {
+        "industry_profiles": ["aerospace"],
+        "hardware_classes": ["flight"]
+      },
+      "target": {
+        "object_type": "test",
+        "selector": {
+          "test_type": "TVAC"
+        }
+      },
+      "when": {
+        "all": [
+          {
+            "field": "hardware_class",
+            "operator": "equals",
+            "value": "flight"
+          },
+          {
+            "field": "context.env_test_required",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "then": {
+        "action": "OPTIONAL",
+        "enforcement": "WARN",
+        "payload": {
+          "test_type": "TVAC",
+          "object_id": "TVAC"
+        }
+      },
+      "why": {
+        "summary": "TVAC test may be required for flight hardware based on mission profile",
+        "citations": ["AS9100_8.5.1"]
+      },
+      "metadata": {
+        "severity": "medium",
+        "tags": ["environmental", "test", "aerospace"],
+        "version": "1.0.0"
+      }
+    }
+  ]
+}

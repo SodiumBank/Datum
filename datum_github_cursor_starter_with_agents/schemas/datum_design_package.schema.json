@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_design_package.schema.json",
+  "title": "Datum Design Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "project_id", "gerber_set", "bom", "assumptions", "created_at"],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "project_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+
+    "gerber_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["upload_id", "files", "sha256", "created_at"],
+      "properties": {
+        "upload_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "type"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1, "maxLength": 512 },
+              "type": {
+                "type": "string",
+                "enum": ["GERBER", "EXCELLON", "READ_ME", "STACKUP", "DRAWING", "OTHER"]
+              }
+            }
+          }
+        },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "created_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+      }
+    },
+
+    "bom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["upload_id", "format", "sha256", "items", "created_at"],
+      "properties": {
+        "upload_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+        "format": { "type": "string", "enum": ["CSV", "XLSX"] },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["refdes", "qty", "mpn"],
+            "properties": {
+              "refdes": { "type": "string", "minLength": 1, "maxLength": 2048 },
+              "qty": { "$ref": "./datum_common.schema.json#/$defs/quantity" },
+              "mpn": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "manufacturer": { "type": "string", "maxLength": 128 },
+              "description": { "type": "string", "maxLength": 512 },
+              "package": { "type": "string", "maxLength": 64 },
+              "value": { "type": "string", "maxLength": 64 },
+              "side": { "$ref": "./datum_common.schema.json#/$defs/side" },
+              "is_eee": { "type": "boolean" },
+              "allow_substitute": { "type": "boolean", "default": false },
+              "avl": {
+                "type": "array",
+                "items": { "type": "string", "minLength": 1, "maxLength": 128 },
+                "maxItems": 25
+              }
+            }
+          }
+        },
+        "created_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+      }
+    },
+
+    "assumptions": { "$ref": "./datum_common.schema.json#/$defs/assumptions" },
+
+    "created_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+    "updated_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+  }
+}

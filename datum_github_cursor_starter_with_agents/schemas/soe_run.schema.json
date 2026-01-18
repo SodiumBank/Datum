@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "datum://schemas/soe_run.schema.json",
+  "title": "Datum SOE Runtime Evaluation",
+  "type": "object",
+  "required": ["soe_version", "industry_profile", "active_packs", "inputs", "decisions", "required_evidence", "gates", "cost_modifiers"],
+  "properties": {
+    "soe_version": { "type": "string" },
+    "industry_profile": { "type": "string", "enum": ["space", "aerospace", "medical", "automotive", "industrial"] },
+    "hardware_class": { "type": "string" },
+    "active_packs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "processes": { "type": "array", "items": { "type": "string" } },
+        "tests_requested": { "type": "array", "items": { "type": "string" } },
+        "materials": { "type": "array", "items": { "type": "string" } },
+        "bom_risk_flags": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "object_type", "object_id", "action", "enforcement", "why"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^DEC-[0-9]{4}$" },
+          "object_type": { "type": "string" },
+          "object_id": { "type": "string" },
+          "action": { "type": "string" },
+          "enforcement": { "type": "string" },
+          "why": {
+            "type": "object",
+            "required": ["rule_id", "pack_id"],
+            "properties": {
+              "rule_id": { "type": "string" },
+              "pack_id": { "type": "string" },
+              "citations": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_type", "applies_to", "object_id"],
+        "properties": {
+          "evidence_type": { "type": "string" },
+          "applies_to": { "type": "string" },
+          "object_id": { "type": "string" },
+          "retention": { "type": "string" }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate_id", "status"],
+        "properties": {
+          "gate_id": { "type": "string" },
+          "status": { "type": "string", "enum": ["open", "blocked", "warning"] },
+          "blocked_by": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "cost_modifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reason", "modifier_type", "value"],
+        "properties": {
+          "reason": { "type": "string" },
+          "modifier_type": { "type": "string", "enum": ["PERCENT", "FIXED"] },
+          "value": { "type": "number" },
+          "rule_id": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

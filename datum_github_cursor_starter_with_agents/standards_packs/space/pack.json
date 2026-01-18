@@ -1,0 +1,8 @@
+{
+  "pack_id": "FLIGHT_TRACEABILITY",
+  "name": "Flight Hardware Traceability",
+  "industry_profiles": ["space"],
+  "description": "Unit-level serialization and evidence bundle requirements for flight hardware",
+  "references": ["AS9100_7.5.3"],
+  "rules": []
+}

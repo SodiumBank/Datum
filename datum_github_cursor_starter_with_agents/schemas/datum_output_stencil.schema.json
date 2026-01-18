@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_output_stencil.schema.json",
+  "title": "Datum Output: STENCIL",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["foil", "sides", "apertures"],
+  "properties": {
+    "foil": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["material", "thickness_mm", "finish"],
+      "properties": {
+        "material": { "type": "string", "enum": ["STAINLESS_STEEL"] },
+        "thickness_mm": { "type": "number", "minimum": 0.05, "maximum": 0.3 },
+        "finish": { "type": "string", "enum": ["ELECTROPOLISHED", "STANDARD"] },
+        "step_stencil": { "type": "boolean", "default": false },
+        "notes": { "type": "string", "maxLength": 1024 }
+      }
+    },
+    "sides": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "./datum_common.schema.json#/$defs/side" }
+    },
+    "apertures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["side", "net", "refdes", "pad_id", "shape", "modification"],
+        "properties": {
+          "side": { "$ref": "./datum_common.schema.json#/$defs/side" },
+          "net": { "type": "string", "maxLength": 128 },
+          "refdes": { "type": "string", "maxLength": 32 },
+          "pad_id": { "type": "string", "maxLength": 64 },
+          "shape": { "type": "string", "enum": ["RECT", "ROUND", "OBROUND", "POLY"] },
+          "modification": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["NONE", "PERCENT_REDUCTION", "WINDOW_PANE", "HOME_PLATE", "ASymmetric_REDUCTION"]
+              },
+              "percent": { "$ref": "./datum_common.schema.json#/$defs/percent" },
+              "window_pane": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "rows": { "type": "integer", "minimum": 1, "maximum": 10 },
+                  "cols": { "type": "integer", "minimum": 1, "maximum": 10 },
+                  "web_mm": { "type": "number", "minimum": 0.05, "maximum": 2.0 }
+                }
+              },
+              "reason": { "type": "string", "maxLength": 512 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

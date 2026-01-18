@@ -1,0 +1,27 @@
+Issue Type,Summary,Description,Priority,Component,Labels,Acceptance Criteria,Parent Epic
+Epic,Standards Overlay Engine (SOE) v1,Implement standards-aware overlay system without modifying core manufacturing logic,Highest,SOE,"soe,architecture,compliance","SOE runs independently and produces deterministic decisions",,
+Story,Define SOE runtime object (SOERun),"Create runtime evaluation object that records industry, active packs, decisions, gates, cost modifiers, and audit why.",Highest,SOE,"json,runtime","SOERun JSON generated for a project and validated against schema",Standards Overlay Engine (SOE) v1
+Story,Create rule expression evaluator,"Implement rule expression evaluation (all/any/none + equals/contains/gt/lt).",Highest,SOE,"rules,engine","Rules evaluate correctly with deterministic output",Standards Overlay Engine (SOE) v1
+Story,Implement rule enforcement actions,"Support REQUIRE, INSERT_STEP, ADD_GATE, ADD_COST_MODIFIER, SET_RETENTION actions.",Highest,SOE,"rules,enforcement","Actions modify SOERun decisions and gates correctly",Standards Overlay Engine (SOE) v1
+Story,Generate 'Why required' explanations,"Generate human-readable justification strings from rule metadata and citations.",High,SOE,"audit,explainability","Each enforced decision includes a readable justification",Standards Overlay Engine (SOE) v1
+Story,Implement release gate blocking,"Block release when enforced rules specify BLOCK_RELEASE.",Highest,SOE,"gates,compliance","Blocked gates prevent release state",Standards Overlay Engine (SOE) v1
+Epic,Industry Profiles v1,Create industry selector and defaults without branching workflows,Highest,SOE,"industry,profiles","Industry profile selected at project creation",,
+Story,Create Space industry profile,"Define Space profile defaults: max rigor, unit traceability, lifetime retention.",Highest,Industry Profiles,"space,profile","Space profile loads correct default packs",Industry Profiles v1
+Story,Create Aerospace industry profile,"Define Aerospace profile with reduced env testing and trace depth.",High,Industry Profiles,"aerospace,profile","Aerospace profile loads correctly",Industry Profiles v1
+Story,Create Medical industry profile,"Define Medical profile with lot traceability and validation emphasis.",Highest,Industry Profiles,"medical,profile","Medical profile loads ISO/FDA packs",Industry Profiles v1
+Story,Create Automotive industry profile,"Define Automotive profile with PPAP/SPC defaults.",High,Industry Profiles,"automotive,profile","Automotive profile loads PPAP packs",Industry Profiles v1
+Story,Create Industrial industry profile,"Define Industrial minimal compliance profile.",Medium,Industry Profiles,"industrial,profile","Industrial profile applies minimal rules",Industry Profiles v1
+Epic,Standards Packs v1,Implement initial standards packs as JSON rule bundles,Highest,Standards,"packs,json","Packs load and evaluate rules",,
+Story,Create Space standards packs,"Create AS9100, JSTD-001 Space, NASA Polymeric, Space Env Test packs.",Highest,Standards,"space,standards","Space packs produce expected mandatory tests and evidence",Standards Packs v1
+Story,Create Medical standards packs,"Create ISO13485, FDA820, Process Validation, DHR packs.",Highest,Standards,"medical,standards","Medical packs enforce IQ/OQ/PQ and DHR",Standards Packs v1
+Story,Create Automotive standards packs,"Create IATF16949, APQP/PPAP, SPC packs.",High,Standards,"automotive,standards","Automotive packs enforce PPAP/SPC",Standards Packs v1
+Story,Create Aerospace delta packs,"Create aerospace-lite deltas from space packs.",Medium,Standards,"aerospace,standards","Aerospace removes TVAC unless required",Standards Packs v1
+Epic,Audit & Transparency Layer,Ensure all decisions are traceable and exportable,High,Audit,"audit,traceability","All decisions are auditable",,
+Story,Create decision log format,"Each SOE decision gets deterministic ID and timestamp.",High,Audit,"decision-log","Decision IDs reproducible",Audit & Transparency Layer
+Story,Implement evidence requirements resolver,"Resolve required evidence and retention rules from packs.",High,Audit,"evidence,retention","Evidence list generated per project",Audit & Transparency Layer
+Story,Export audit manifest,"Export JSON manifest listing rules, decisions, evidence, and citations.",High,Audit,"export,audit","Audit manifest exports clean JSON",Audit & Transparency Layer
+Epic,Integration with Existing Core,Integrate SOE outputs without refactoring existing logic,Highest,Integration,"integration,non-invasive","Core behavior unchanged",,
+Story,Attach SOERun to project model,"SOERun stored alongside existing project data.",Highest,Integration,"project-model","Existing project loads unaffected",Integration with Existing Core
+Story,Inject enforced steps into process plan,"Insert required steps/tests non-destructively.",Highest,Integration,"process-plan","Inserted steps flagged as SOE-required",Integration with Existing Core
+Story,Apply cost modifiers to existing cost model,"Apply additive or percentage modifiers without altering base logic.",High,Integration,"costing","Cost deltas visible and traceable",Integration with Existing Core
+Story,Block release via existing release mechanism,"Reuse existing release gating, driven by SOE gates.",Highest,Integration,"release","Blocked projects cannot advance",Integration with Existing Core

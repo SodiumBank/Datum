@@ -1,0 +1,14 @@
+{
+  "industry_profile": "aerospace",
+  "default_packs": [
+    "AS9100_BASE",
+    "JSTD001_BASE",
+    "AEROSPACE_ENV_TESTS"
+  ],
+  "risk_posture": "high",
+  "defaults": {
+    "evidence_retention": "LIFE_OF_PROGRAM",
+    "traceability_depth": "lot_based",
+    "approval_gates": ["DESIGN_REVIEW", "PROCESS_REVIEW", "RELEASE"]
+  }
+}

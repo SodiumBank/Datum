@@ -1,0 +1,8 @@
+{
+  "pack_id": "FDA_QSR_820_CORE",
+  "name": "FDA QSR 820 Core Requirements",
+  "industry_profiles": ["medical"],
+  "description": "FDA Quality System Regulation 21 CFR Part 820 requirements",
+  "references": ["FDA_21_CFR_820"],
+  "rules": []
+}

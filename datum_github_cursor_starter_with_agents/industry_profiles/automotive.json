@@ -1,0 +1,15 @@
+{
+  "industry_profile": "automotive",
+  "default_packs": [
+    "IATF16949_BASE",
+    "APQP_PPAP_CORE",
+    "SPC_CAPABILITY",
+    "LOT_TRACEABILITY_AUTOMOTIVE"
+  ],
+  "risk_posture": "high",
+  "defaults": {
+    "evidence_retention": "PRODUCTION_PLUS_15_YEARS",
+    "traceability_depth": "lot_based",
+    "approval_gates": ["PPAP_APPROVAL", "SPC_REVIEW", "RELEASE"]
+  }
+}

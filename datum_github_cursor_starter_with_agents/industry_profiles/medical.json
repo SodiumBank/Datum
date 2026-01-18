@@ -1,0 +1,16 @@
+{
+  "industry_profile": "medical",
+  "default_packs": [
+    "ISO13485_BASE",
+    "FDA_QSR_820_CORE",
+    "IPC_WORKMANSHIP_BASE",
+    "PROCESS_VALIDATION_IQOQPQ",
+    "DHR_DMR_EVIDENCE_BUNDLE"
+  ],
+  "risk_posture": "high",
+  "defaults": {
+    "evidence_retention": "LIFE_OF_DEVICE_PLUS_2_YEARS",
+    "traceability_depth": "lot_based",
+    "approval_gates": ["DESIGN_CONTROL", "PROCESS_VALIDATION", "DHF_REVIEW", "RELEASE"]
+  }
+}

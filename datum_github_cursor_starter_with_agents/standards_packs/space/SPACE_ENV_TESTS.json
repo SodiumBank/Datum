@@ -1,0 +1,53 @@
+{
+  "pack_id": "SPACE_ENV_TESTS",
+  "name": "Space Environmental Tests",
+  "industry_profiles": ["space"],
+  "description": "Environmental test requirements for space hardware (TVAC, vibration, shock)",
+  "references": ["NASA_GEVS", "AS9100_8_5_1"],
+  "rules": [
+    {
+      "rule_id": "SPACE.TEST.TVAC.FLIGHT",
+      "applies": {
+        "industry_profiles": ["space"],
+        "hardware_classes": ["flight", "protoflight"]
+      },
+      "target": {
+        "object_type": "test",
+        "selector": {
+          "test_type": "TVAC"
+        }
+      },
+      "when": {
+        "any": [
+          {
+            "field": "hardware_class",
+            "operator": "equals",
+            "value": "flight"
+          },
+          {
+            "field": "hardware_class",
+            "operator": "equals",
+            "value": "protoflight"
+          }
+        ]
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "test_type": "TVAC",
+          "object_id": "TVAC"
+        }
+      },
+      "why": {
+        "summary": "TVAC test required for flight hardware per NASA GEVS and AS9100",
+        "citations": ["NASA_GEVS", "AS9100_8_5_1"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["environmental", "test", "flight"],
+        "version": "1.0.0"
+      }
+    }
+  ]
+}

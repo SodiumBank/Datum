@@ -1,0 +1,52 @@
+{
+  "pack_id": "APQP_PPAP_CORE",
+  "name": "APQP/PPAP Core Requirements",
+  "industry_profiles": ["automotive"],
+  "description": "Advanced Product Quality Planning and Production Part Approval Process requirements",
+  "references": ["AIAG_APQP", "AIAG_PPAP"],
+  "rules": [
+    {
+      "rule_id": "AUTO.RELEASE.PPAP.REQUIRED",
+      "applies": {
+        "industry_profiles": ["automotive"]
+      },
+      "target": {
+        "object_type": "release_gate",
+        "selector": {
+          "gate_id": "GATE-RELEASE"
+        }
+      },
+      "when": {
+        "all": [
+          {
+            "field": "industry_profile",
+            "operator": "equals",
+            "value": "automotive"
+          },
+          {
+            "field": "context.first_production_run",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "then": {
+        "action": "ADD_GATE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "gate_id": "GATE-PPAP",
+          "required_documents": ["PSW", "DFMEA", "PFMEA", "CONTROL_PLAN", "SPC_DATA"]
+        }
+      },
+      "why": {
+        "summary": "PPAP approval required for first production run per AIAG PPAP manual",
+        "citations": ["AIAG_PPAP"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["ppap", "approval", "release"],
+        "version": "1.0.0"
+      }
+    }
+  ]
+}

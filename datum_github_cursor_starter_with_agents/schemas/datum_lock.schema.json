@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_lock.schema.json",
+  "title": "DatumLock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "entity_type", "entity_id", "locked_by", "locked_at", "lock_reason"],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "entity_type": { "type": "string", "enum": ["DATUM_QUOTE", "DATUM_PLAN", "DATUM_OUTPUTS"] },
+    "entity_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "locked_by": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "locked_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+    "lock_reason": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "requires_contract": { "type": "boolean", "default": false }
+  }
+}

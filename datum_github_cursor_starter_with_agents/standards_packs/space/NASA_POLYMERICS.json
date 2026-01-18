@@ -1,0 +1,57 @@
+{
+  "pack_id": "NASA_POLYMERICS",
+  "name": "NASA Polymerics Control",
+  "industry_profiles": ["space"],
+  "description": "NASA-STD-8739.1 polymerics requirements for staking, coating, and curing",
+  "references": ["NASA-STD-8739.1"],
+  "rules": [
+    {
+      "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+      "applies": {
+        "industry_profiles": ["space"]
+      },
+      "target": {
+        "object_type": "process_step",
+        "selector": {
+          "step_type": "POLYMER"
+        }
+      },
+      "when": {
+        "any": [
+          {
+            "field": "inputs.materials",
+            "operator": "contains",
+            "value": "epoxy"
+          },
+          {
+            "field": "inputs.processes",
+            "operator": "contains",
+            "value": "CONFORMAL_COAT"
+          },
+          {
+            "field": "inputs.processes",
+            "operator": "contains",
+            "value": "STAKING"
+          }
+        ]
+      },
+      "then": {
+        "action": "INSERT_STEP",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "steps": ["CLEAN", "BAKE", "POLYMER", "CURE", "INSPECT"],
+          "lock_sequence": true
+        }
+      },
+      "why": {
+        "summary": "NASA-STD-8739.1 requires clean before staking/coating, bake after clean, inspect after cure",
+        "citations": ["NASA-STD-8739.1"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["process", "polymerics", "sequence"],
+        "version": "1.0.0"
+      }
+    }
+  ]
+}

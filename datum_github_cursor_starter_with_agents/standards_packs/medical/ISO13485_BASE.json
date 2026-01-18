@@ -1,0 +1,8 @@
+{
+  "pack_id": "ISO13485_BASE",
+  "name": "ISO 13485 Medical Devices",
+  "industry_profiles": ["medical"],
+  "description": "ISO 13485 quality management system for medical devices",
+  "references": ["ISO_13485"],
+  "rules": []
+}

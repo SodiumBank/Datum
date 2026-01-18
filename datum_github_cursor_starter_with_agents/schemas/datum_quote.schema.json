@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/datum_quote.schema.json",
+  "title": "DatumQuote (Versioned, Immutable After Lock)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id", "design_id", "org_id", "tier",
+    "revision_id", "quote_version",
+    "inputs_fingerprint", "lead_time_days",
+    "cost_breakdown", "risk_factors",
+    "assumptions", "status", "created_at"
+  ],
+  "properties": {
+    "id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "org_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "design_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "tier": { "$ref": "./datum_common.schema.json#/$defs/tier" },
+
+    "revision_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "quote_version": { "type": "integer", "minimum": 1, "maximum": 9999 },
+
+    "inputs_fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hash of design package + assumptions + pricing model version"
+    },
+
+    "quantity": { "$ref": "./datum_common.schema.json#/$defs/quantity" },
+    "lead_time_days": { "type": "integer", "minimum": 1, "maximum": 365 },
+
+    "cost_breakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "currency", "lines"],
+      "properties": {
+        "currency": { "$ref": "./datum_common.schema.json#/$defs/currencyCode" },
+        "total": { "type": "number", "minimum": 0 },
+        "lines": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "label", "amount"],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "PCB_FAB", "ASSEMBLY_LABOR", "COMPONENTS",
+                  "NRE", "TEST", "INSPECTION", "POLYMERICS",
+                  "SUPPLY_CHAIN_RISK", "EEE_HANDLING", "INVENTORY_CARRY",
+                  "MARGIN", "SHIPPING", "OTHER"
+                ]
+              },
+              "label": { "type": "string", "maxLength": 64 },
+              "amount": { "type": "number", "minimum": 0 },
+              "notes": { "type": "string", "maxLength": 512 }
+            }
+          }
+        }
+      }
+    },
+
+    "risk_factors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "summary"],
+        "properties": {
+          "code": { "type": "string", "minLength": 2, "maxLength": 64 },
+          "severity": { "$ref": "./datum_common.schema.json#/$defs/severity" },
+          "summary": { "type": "string", "maxLength": 256 },
+          "details": { "type": "string", "maxLength": 2048 },
+          "impacts": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "cost_delta": { "type": "number" },
+              "lead_time_delta_days": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+
+    "assumptions": { "$ref": "./datum_common.schema.json#/$defs/assumptions" },
+
+    "status": {
+      "type": "string",
+      "enum": ["DRAFT", "ESTIMATED", "NEEDS_REVIEW", "APPROVED", "LOCKED", "CANCELLED"]
+    },
+
+    "expires_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+    "created_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+    "updated_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "pack_id": "JSTD001_SPACE",
+  "name": "IPC J-STD-001 Space Addendum",
+  "industry_profiles": ["space"],
+  "description": "IPC J-STD-001 with space addendum requirements",
+  "references": ["IPC_J_STD_001", "IPC_J_STD_001_SPACE_ADDENDUM"],
+  "rules": []
+}
