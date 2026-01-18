@@ -14,7 +14,7 @@ def sample_quote():
         "org_id": "org_test_001",
         "design_id": "design_test_001",
         "tier": "TIER_1",
-        "revision_id": "rev_A",
+        "revision_id": "rev_ab12cd34",
         "quote_version": 1,
         "inputs_fingerprint": "a" * 64,
         "lead_time_days": 14,

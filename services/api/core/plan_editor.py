@@ -34,13 +34,11 @@ def _generate_plan_version(plan: Dict[str, Any]) -> int:
 
 def _is_soe_locked_step(step: Dict[str, Any]) -> bool:
     """Check if step is locked by SOE."""
+    # SOE lock is based on explicit SOE fields, not ruleset version
+    # (ruleset_version == 1 is used for baseline/default steps, not SOE)
     return (
         step.get("soe_decision_id") is not None
         or step.get("locked_sequence", False)
-        or any(
-            rule.get("ruleset_version") == 1  # SOE ruleset
-            for rule in step.get("source_rules", [])
-        )
     )
 
 
@@ -72,18 +70,18 @@ def validate_plan_edit(
     Returns:
         (is_valid, error_message)
     """
+    # Cannot edit approved plans (they're immutable) - check before locked
+    if original_plan.get("state") == "approved":
+        return (
+            False,
+            "Approved plans are immutable. Create a new version to make changes.",
+        )
+    
     # Cannot edit locked plans
     if original_plan.get("locked"):
         return (
             False,
             "Plan is locked. Create a new revision to make changes.",
-        )
-    
-    # Cannot edit approved plans (they're immutable)
-    if original_plan.get("state") == "approved":
-        return (
-            False,
-            "Approved plans are immutable. Create a new version to make changes.",
         )
     
     original_steps = {s["step_id"]: s for s in original_plan.get("steps", [])}

@@ -284,6 +284,10 @@ def evaluate_soe(
     Returns:
         SOERun object with decisions, gates, and modifiers (including profile_stack if active_profiles provided)
     """
+    # Default hardware_class to "generic" if None (schema requires string, not None)
+    if hardware_class is None:
+        hardware_class = "generic"
+    
     # Sprint 5: Resolve bundle to profiles if provided
     if profile_bundle_id:
         from services.api.core.profile_bundles import resolve_bundle_profiles
