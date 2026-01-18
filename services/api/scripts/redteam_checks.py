@@ -102,6 +102,9 @@ def check_no_override_flags() -> List[Tuple[str, bool, str]]:
     for file_path in api_dir.rglob("*.py"):
         if "test" in str(file_path) or "__pycache__" in str(file_path):
             continue
+        # Skip redteam_checks.py itself (it contains patterns we're checking for)
+        if "redteam_checks.py" in str(file_path):
+            continue
         
         content = file_path.read_text(encoding="utf-8")
         relative_path = str(file_path.relative_to(api_dir))
