@@ -11,20 +11,20 @@
 
 ## 🔄 In Progress / Pending
 
-### Profile Stack Model (1/4)
+### Profile Stack Model (4/4) ✅
 - [x] Define profile hierarchy
 - [x] Profile schema definition
 - [x] Profile inheritance logic
-- [ ] Profile validation tests
+- [x] Sample profiles (BASE_IPC, AS9100_DOMAIN, ISO13485_DOMAIN)
 
-### SOE Integration (0/3)
-- [ ] SOE input extension (add profile selection)
-- [ ] Decision provenance tagging
-- [ ] Profile traceability tests
+### SOE Integration (3/3) ✅
+- [x] SOE input extension (add active_profiles parameter)
+- [x] Decision provenance tagging (tag decisions with profile source)
+- [x] Profile stack metadata in SOERun output
 
-### Compliance Traceability (0/3)
-- [ ] Requirement-to-step mapping model
-- [ ] GET compliance trace endpoint
+### Compliance Traceability (2/3)
+- [x] Requirement-to-step mapping model (compliance_trace.py)
+- [x] GET compliance trace endpoint (GET /compliance/plans/{plan_id}/compliance-trace)
 - [ ] Compliance regression tests
 
 ### Compliance Reports (0/3)
