@@ -4,10 +4,7 @@ Track versions of standards profiles with full audit history.
 """
 
 import json
-<<<<<<< HEAD
 from datetime import datetime, timezone
-=======
->>>>>>> d60be2c0f788d31a7252fb9e53769dfe0fea389f
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
@@ -45,13 +42,7 @@ def create_profile_version(
     
     profile["version"] = new_version
     profile["metadata"]["parent_version"] = parent_version or profile.get("version")
-<<<<<<< HEAD
     profile["metadata"]["version_created_at"] = datetime.now(timezone.utc).isoformat()
-=======
-    profile["metadata"]["version_created_at"] = json.loads(
-        json.dumps({"timestamp": "now"})  # Would use datetime in real impl
-    )
->>>>>>> d60be2c0f788d31a7252fb9e53769dfe0fea389f
     
     # Validate
     validate_schema(profile, "standards_profile.schema.json")

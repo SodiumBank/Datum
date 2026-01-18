@@ -191,7 +191,6 @@ def generate_deviations_overrides_section(plan: Dict[str, Any]) -> Dict[str, Any
     if plan.get("override_reason"):
         overrides.append({
             "level": "plan",
-<<<<<<< HEAD
             "entity_id": plan.get("id"),
             "override_reason": plan.get("override_reason"),
             "override_by": plan.get("override_by"),
@@ -325,7 +324,6 @@ def build_compliance_report_data(plan_id: str) -> Dict[str, Any]:
         "executive_summary": {
             "plan_id": plan_id,
             "plan_version": plan.get("version"),
-<<<<<<< HEAD
             "status": plan.get("state"),
             "total_steps": len(plan.get("steps", [])),
             "total_tests": len(plan.get("tests", [])),
