@@ -359,10 +359,15 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                     "sequence": sequence_counter,
                     "required": payload.get("required", True),
                     "locked_sequence": payload.get("lock_sequence", False),
-                    "parameters": {"test_type": test_type, **payload.get("parameters", {})},
-                    "acceptance": payload.get("acceptance"),
                     "source_rules": [source_rule],
                 }
+                # Add optional fields only if present
+                params = {"test_type": test_type}
+                if payload.get("parameters"):
+                    params.update(payload.get("parameters", {}))
+                new_step["parameters"] = params
+                if payload.get("acceptance"):
+                    new_step["acceptance"] = payload.get("acceptance")
                 new_steps.append(new_step)
                 
                 if payload.get("lock_sequence", False):
