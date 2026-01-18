@@ -20,6 +20,42 @@
     "plan_revision": { "type": "string", "pattern": "^[A-Z]{1,2}$" },
     "locked": { "type": "boolean" },
     "lock_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Plan version number (increments with each edit)"
+    },
+    "parent_version": {
+      "type": "integer",
+      "description": "Parent version this plan was edited from"
+    },
+    "state": {
+      "type": "string",
+      "enum": ["draft", "submitted", "approved", "rejected"],
+      "default": "draft",
+      "description": "Plan approval state"
+    },
+    "edit_metadata": {
+      "type": "object",
+      "properties": {
+        "edited_by": { "$ref": "./datum_common.schema.json#/$defs/id" },
+        "edited_at": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" },
+        "edit_reason": { "type": "string", "maxLength": 512 },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["constraint", "reason", "user_id", "timestamp"],
+            "properties": {
+              "constraint": { "type": "string" },
+              "reason": { "type": "string" },
+              "user_id": { "$ref": "./datum_common.schema.json#/$defs/id" },
+              "timestamp": { "$ref": "./datum_common.schema.json#/$defs/isoTimestamp" }
+            }
+          }
+        }
+      }
+    },
     "derived_from_ruleset": {
       "type": "object",
       "additionalProperties": false,

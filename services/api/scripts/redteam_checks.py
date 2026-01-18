@@ -1,6 +1,7 @@
 """Red-team checks for Datum - prevent security violations and guardrail breaches.
 
 Sprint 2: Extend checks to prevent edits/overrides in Sprint 2 artifacts.
+Sprint 3: Update checks to allow overrides with justification and prevent silent overrides.
 """
 
 import json

@@ -1,0 +1,38 @@
+Issue Type,Summary,Description,Priority,Component,Epic Name
+Epic,Sprint 3 – Editable & Governed Manufacturing Plans,Transition Datum from read-only deterministic intent to governed, editable, approval-driven manufacturing plans with exportable execution artifacts.,Highest,Program,EPIC-3
+Story,Editable Datum Plans (Backend),Enable controlled editing of Datum Plans while preserving SOE traceability and audit history. PATCH /plans/{plan_id} supports edits with validation. Original SOE intent remains immutable.,Highest,API / Core,EPIC-3
+Sub-task,Define editable vs immutable plan fields,Identify which DatumPlan fields are editable and which are permanently locked to SOE intent.,High,API / Core,EPIC-3
+Sub-task,Update DatumPlan schema for edits,Add edit metadata including editor, timestamp, and reason.,High,API / Core,EPIC-3
+Sub-task,Add edit validation layer,Prevent removal of required steps or violation of test dependencies.,Highest,API / Core,EPIC-3
+Sub-task,Edit regression tests,Add unit tests covering valid and invalid plan edits.,High,QA,EPIC-3
+Story,Plan Optimization Engine,Provide deterministic optimization of step ordering for throughput or cost while preserving SOE and test constraints.,High,Core Logic,EPIC-3
+Sub-task,Define optimization rules,Document allowed reordering rules and constraints.,High,Core Logic,EPIC-3
+Sub-task,Implement optimization pass,Create POST /plans/{plan_id}/optimize endpoint producing a new plan version.,High,Core Logic,EPIC-3
+Sub-task,Generate optimization diff summary,Return human-readable explanation of optimization changes.,Medium,Core Logic,EPIC-3
+Sub-task,Optimization regression tests,Ensure optimization never violates SOE intent or test order.,High,QA,EPIC-3
+Story,Plan Versioning & History,Introduce immutable plan versions with full audit history and diff support.,High,Data Model,EPIC-3
+Sub-task,Versioned plan schema,Add version identifiers and parent references.,High,Data Model,EPIC-3
+Sub-task,Plan diff engine,Support comparison between plan versions.,Medium,Core Logic,EPIC-3
+Sub-task,GET plan versions endpoint,Expose GET /plans/{plan_id}/versions.,Medium,API / Core,EPIC-3
+Story,Approval Workflow,Add approval gates before plans can be executed or exported.,Highest,Workflow / API,EPIC-3
+Sub-task,Plan state machine,Implement draft → submitted → approved → rejected states.,Highest,Workflow / API,EPIC-3
+Sub-task,Approval endpoints,Add submit, approve, and reject endpoints with role enforcement.,Highest,Workflow / API,EPIC-3
+Sub-task,Approval validation tests,Ensure only approved plans are exportable.,High,QA,EPIC-3
+Story,Override Mechanism with Justification,Allow explicit SOE overrides with mandatory justification and audit trail.,High,Compliance,EPIC-3
+Sub-task,Override schema,Store reason, user, timestamp, and affected constraint.,High,Compliance,EPIC-3
+Sub-task,Override red-team rule updates,Ensure silent overrides are impossible.,Highest,Compliance,EPIC-3
+Sub-task,Override UI indicators,Visually flag overridden steps in UI.,Medium,Frontend,EPIC-3
+Story,Execution Export Engine,Generate production-ready exports from approved plans.,High,Exports,EPIC-3
+Sub-task,Define export templates,Create CSV and JSON execution templates.,High,Exports,EPIC-3
+Sub-task,Export generator service,Generate exports only from approved plans.,High,Exports,EPIC-3
+Sub-task,Export validation tests,Ensure exported data matches plan version and approval state.,High,QA,EPIC-3
+Story,Ops UI – Editable Plan View,Upgrade Ops UI to support editing with governance.,High,Frontend,EPIC-3
+Sub-task,Editable plan components,Implement editable fields with inline validation.,High,Frontend,EPIC-3
+Sub-task,Read-only SOE locks,Lock SOE-derived fields visually and functionally.,High,Frontend,EPIC-3
+Sub-task,Version history selector,Allow users to view prior plan versions.,Medium,Frontend,EPIC-3
+Story,Ops UI – Approval & Audit Views,Expose approval actions and audit history in the UI.,Medium,Frontend,EPIC-3
+Sub-task,Approval action buttons,Show approve/reject controls based on role.,Medium,Frontend,EPIC-3
+Sub-task,Audit log timeline,Display audit events and override justifications.,Medium,Frontend,EPIC-3
+Story,Regression & Determinism Safeguards,Ensure Sprint 2 determinism guarantees remain intact.,Highest,QA,EPIC-3
+Sub-task,SOE determinism regression tests,Verify SOE → initial plan is always deterministic.,Highest,QA,EPIC-3
+Sub-task,Red-team test updates,Block bypass of approval or override requirements.,Highest,QA,EPIC-3

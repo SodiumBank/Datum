@@ -25,10 +25,10 @@ def get_execution_outputs_endpoint(
     auth: dict = Depends(require_role("OPS", "ADMIN")),
 ):
     """
-    Get execution outputs for a plan (Sprint 2: read-only intent).
+    Get execution outputs for a plan (Sprint 3: production-ready if approved).
     
-    Returns stencil, placement, selective solder, lead form, and programming intents.
-    NO machine files, NO production-ready artifacts.
+    Returns stencil, placement, selective solder, lead form, and programming outputs.
+    Production-ready exports available only for approved plans.
     """
     plan = get_plan(plan_id)
     if not plan:
@@ -59,7 +59,7 @@ def get_execution_outputs_endpoint(
         "plan_id": plan_id,
         "quote_id": quote_id,
         "outputs": outputs,
-        "note": "Sprint 2: Read-only intent - not production-ready",
+        "note": "Sprint 3: Production-ready exports available for approved plans",
     }
 
 
