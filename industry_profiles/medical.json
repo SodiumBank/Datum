@@ -5,7 +5,8 @@
     "FDA_QSR_820_CORE",
     "IPC_WORKMANSHIP_BASE",
     "PROCESS_VALIDATION_IQOQPQ",
-    "DHR_DMR_EVIDENCE_BUNDLE"
+    "DHR_DMR_EVIDENCE_BUNDLE",
+    "LOT_TRACEABILITY_MEDICAL"
   ],
   "risk_posture": "high",
   "defaults": {

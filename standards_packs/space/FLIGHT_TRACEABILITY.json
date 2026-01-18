@@ -4,5 +4,79 @@
   "industry_profiles": ["space"],
   "description": "Unit-level serialization and evidence bundle requirements for flight hardware",
   "references": ["AS9100_7.5.3"],
-  "rules": []
+  "rules": [
+    {
+      "rule_id": "SPACE.TRACEABILITY.UNIT_SERIALIZED",
+      "pack_id": "FLIGHT_TRACEABILITY",
+      "applies": {
+        "industry_profiles": ["space"],
+        "hardware_classes": ["flight"]
+      },
+      "target": {
+        "object_type": "document",
+        "selector": {
+          "doc_type": "TRACEABILITY"
+        }
+      },
+      "when": {
+        "field": "hardware_class",
+        "operator": "equals",
+        "value": "flight"
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "doc_type": "TRACEABILITY",
+          "object_id": "UNIT_SERIALIZED",
+          "requirements": ["unit_serialization", "evidence_bundle"]
+        }
+      },
+      "why": {
+        "summary": "Unit-level serialization required for flight hardware per AS9100 7.5.3",
+        "citations": ["AS9100_7.5.3"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["traceability", "flight", "serialization"],
+        "version": "1.0.0"
+      }
+    },
+    {
+      "rule_id": "SPACE.EVIDENCE.LIFE_OF_PROGRAM",
+      "pack_id": "FLIGHT_TRACEABILITY",
+      "applies": {
+        "industry_profiles": ["space"],
+        "hardware_classes": ["flight"]
+      },
+      "target": {
+        "object_type": "evidence",
+        "selector": {
+          "evidence_type": "ALL"
+        }
+      },
+      "when": {
+        "field": "hardware_class",
+        "operator": "equals",
+        "value": "flight"
+      },
+      "then": {
+        "action": "SET_RETENTION",
+        "enforcement": "BLOCK_RELEASE",
+        "payload": {
+          "retention": "LIFE_OF_PROGRAM",
+          "applies_to": "all"
+        }
+      },
+      "why": {
+        "summary": "Life-of-program evidence retention required for flight hardware",
+        "citations": ["AS9100_7.5.3"]
+      },
+      "metadata": {
+        "severity": "critical",
+        "tags": ["evidence", "retention", "flight"],
+        "version": "1.0.0"
+      }
+    }
+  ]
 }

@@ -4,5 +4,51 @@
   "industry_profiles": ["space", "aerospace"],
   "description": "AS9100 quality management system requirements for aviation, space, and defense",
   "references": ["AS9100"],
-  "rules": []
+  "rules": [
+    {
+      "rule_id": "AS9100.EVIDENCE.COA.REQUIRED",
+      "pack_id": "AS9100_BASE",
+      "applies": {
+        "industry_profiles": ["space", "aerospace"]
+      },
+      "target": {
+        "object_type": "evidence",
+        "selector": {
+          "evidence_type": "COA"
+        }
+      },
+      "when": {
+        "any": [
+          {
+            "field": "inputs.materials",
+            "operator": "contains",
+            "value": "epoxy"
+          },
+          {
+            "field": "inputs.materials",
+            "operator": "contains",
+            "value": "adhesive"
+          }
+        ]
+      },
+      "then": {
+        "action": "REQUIRE",
+        "enforcement": "WARN",
+        "payload": {
+          "evidence_type": "COA",
+          "applies_to": "material",
+          "retention": "LIFE_OF_PROGRAM"
+        }
+      },
+      "why": {
+        "summary": "Certificate of Analysis required for critical materials per AS9100",
+        "citations": ["AS9100_8.5.1"]
+      },
+      "metadata": {
+        "severity": "high",
+        "tags": ["evidence", "coa", "material"],
+        "version": "1.0.0"
+      }
+    }
+  ]
 }

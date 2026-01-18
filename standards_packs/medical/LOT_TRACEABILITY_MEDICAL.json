@@ -1,15 +1,15 @@
 {
-  "pack_id": "LOT_TRACEABILITY_AUTOMOTIVE",
-  "name": "Automotive Lot Traceability",
-  "industry_profiles": ["automotive"],
-  "description": "Lot-based traceability requirements for automotive parts",
-  "references": ["IATF_16949_8.5.2"],
+  "pack_id": "LOT_TRACEABILITY_MEDICAL",
+  "name": "Medical Lot Traceability",
+  "industry_profiles": ["medical"],
+  "description": "Lot-based traceability requirements for medical devices",
+  "references": ["FDA_21_CFR_820.65", "ISO_13485_7.5.9"],
   "rules": [
     {
-      "rule_id": "AUTO.TRACEABILITY.LOT",
-      "pack_id": "LOT_TRACEABILITY_AUTOMOTIVE",
+      "rule_id": "MEDICAL.TRACEABILITY.LOT",
+      "pack_id": "LOT_TRACEABILITY_MEDICAL",
       "applies": {
-        "industry_profiles": ["automotive"]
+        "industry_profiles": ["medical"]
       },
       "target": {
         "object_type": "document",
@@ -20,7 +20,7 @@
       "when": {
         "field": "industry_profile",
         "operator": "equals",
-        "value": "automotive"
+        "value": "medical"
       },
       "then": {
         "action": "REQUIRE",
@@ -32,12 +32,12 @@
         }
       },
       "why": {
-        "summary": "Lot-based traceability required for automotive parts per IATF 16949 8.5.2",
-        "citations": ["IATF_16949_8.5.2"]
+        "summary": "Lot-based traceability required for medical devices per FDA QSR 820.65",
+        "citations": ["FDA_21_CFR_820.65", "ISO_13485_7.5.9"]
       },
       "metadata": {
         "severity": "critical",
-        "tags": ["traceability", "lot", "automotive"],
+        "tags": ["traceability", "lot", "medical"],
         "version": "1.0.0"
       }
     }

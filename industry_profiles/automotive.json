@@ -4,7 +4,8 @@
     "IATF16949_BASE",
     "APQP_PPAP_CORE",
     "SPC_CAPABILITY",
-    "LOT_TRACEABILITY_AUTOMOTIVE"
+    "LOT_TRACEABILITY_AUTOMOTIVE",
+    "IPC_WORKMANSHIP_BASE"
   ],
   "risk_posture": "high",
   "defaults": {
