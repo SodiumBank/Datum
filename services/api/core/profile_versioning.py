@@ -36,6 +36,14 @@ def create_profile_version(
     # Load current profile
     profile = load_profile(profile_id)
     
+    # Sprint 6: Ensure approved profiles are immutable - versioning must be explicit
+    from services.api.core.profile_lifecycle import get_profile_state, ensure_profile_immutable
+    state = get_profile_state(profile_id)
+    if state == "approved":
+        # Approved profiles can have versions created (creates new file, doesn't modify base)
+        # But we should ensure base profile isn't being overwritten
+        ensure_profile_immutable(profile_id)
+    
     # Add version metadata
     if "metadata" not in profile:
         profile["metadata"] = {}
@@ -47,7 +55,8 @@ def create_profile_version(
     # Validate
     validate_schema(profile, "standards_profile.schema.json")
     
-    # Save as versioned file
+    # Save as versioned file (Sprint 6: this creates a NEW file, doesn't modify base)
+    # Versioned files are: {profile_id}.v{version}.json, base is {profile_id}.json
     versioned_path = PROFILES_DIR / f"{profile_id}.v{new_version}.json"
     with open(versioned_path, "w", encoding="utf-8") as f:
         json.dump(profile, f, indent=2, ensure_ascii=False)

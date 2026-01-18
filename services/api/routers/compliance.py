@@ -97,8 +97,8 @@ def generate_compliance_report_endpoint(
     Only approved plans can have reports generated.
     """
     try:
-        if format not in ["html", "pdf"]:
-            raise ValueError(f"Unsupported format: {format}. Use 'html' or 'pdf'")
+        if format not in ["html"]:
+            raise ValueError(f"Unsupported format: {format}. Currently only 'html' is supported. PDF generation is deferred to a future sprint.")
         
         report = generate_compliance_report(plan_id, format=format)
         return {

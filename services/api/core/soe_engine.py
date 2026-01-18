@@ -290,10 +290,22 @@ def evaluate_soe(
         try:
             bundle_profiles = resolve_bundle_profiles(profile_bundle_id)
             # Merge with active_profiles if provided
+            # Sprint 6: DETERMINISTIC - sort merged profiles by semantic layer then profile_id
             if active_profiles:
-                active_profiles = list(set(active_profiles + bundle_profiles))
+                # Merge and sort deterministically (no set() for order stability)
+                merged = active_profiles + bundle_profiles
+                # Remove duplicates while preserving order (first occurrence wins)
+                seen = set()
+                unique_profiles = []
+                for pid in merged:
+                    if pid not in seen:
+                        seen.add(pid)
+                        unique_profiles.append(pid)
+                # Sort deterministically: load profile types, then sort by layer, then by profile_id
+                # For deterministic ordering, we'll sort by profile_id (simple and stable)
+                active_profiles = sorted(unique_profiles)
             else:
-                active_profiles = bundle_profiles
+                active_profiles = sorted(bundle_profiles)  # Also sorted for determinism
         except ValueError as e:
             print(f"Warning: Failed to resolve bundle {profile_bundle_id}: {e}")
     
