@@ -1,0 +1,60 @@
+{
+  "soe_version": "1.0.0",
+  "industry_profile": "space",
+  "hardware_class": "flight",
+  "active_packs": [
+    "AS9100_BASE",
+    "JSTD001_SPACE",
+    "NASA_POLYMERICS",
+    "SPACE_ENV_TESTS",
+    "FLIGHT_TRACEABILITY"
+  ],
+  "inputs": {
+    "processes": ["SMT", "REFLOW", "CONFORMAL_COAT"],
+    "tests_requested": ["FUNCTIONAL", "X_RAY"],
+    "materials": ["EPOXY_3M_SCOTCHWELD_2216"],
+    "bom_risk_flags": ["LONG_LEAD_EEE", "SINGLE_SOURCE"]
+  },
+  "decisions": [
+    {
+      "id": "DEC-12345678",
+      "object_type": "test",
+      "object_id": "TVAC",
+      "action": "REQUIRE",
+      "enforcement": "BLOCK_RELEASE",
+      "why": {
+        "rule_id": "SPACE.TEST.TVAC.FLIGHT",
+        "pack_id": "SPACE_ENV_TESTS",
+        "citations": ["NASA_GEVS", "AS9100_8_5_1"]
+      }
+    },
+    {
+      "id": "DEC-87654321",
+      "object_type": "process_step",
+      "object_id": "POLYMER",
+      "action": "INSERT_STEP",
+      "enforcement": "BLOCK_RELEASE",
+      "why": {
+        "rule_id": "NASA.PROCESS.POLYMERICS.SEQUENCE",
+        "pack_id": "NASA_POLYMERICS",
+        "citations": ["NASA-STD-8739.1"]
+      }
+    }
+  ],
+  "required_evidence": [
+    {
+      "evidence_type": "COA",
+      "applies_to": "material",
+      "object_id": "EPOXY_3M_SCOTCHWELD_2216",
+      "retention": "LIFE_OF_PROGRAM"
+    }
+  ],
+  "gates": [
+    {
+      "gate_id": "GATE-RELEASE",
+      "status": "blocked",
+      "blocked_by": ["DEC-0001", "DEC-0002"]
+    }
+  ],
+  "cost_modifiers": []
+}

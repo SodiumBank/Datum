@@ -171,6 +171,12 @@ def _evaluate_rule_expression(expr: Dict[str, Any], context: Dict[str, Any]) -> 
             if isinstance(value, list):
                 return context_value not in value
             return True
+        elif operator == "exists":
+            # Check if field exists and is not None
+            return context_value is not None
+        elif operator == "not_exists":
+            # Check if field does not exist or is None
+            return context_value is None
     
     return False
 
@@ -234,6 +240,20 @@ def _apply_rule_action(rule: Dict[str, Any], context: Dict[str, Any]) -> Dict[st
     }
     
     return decision
+
+
+def run_soe(
+    industry_profile: str,
+    inputs: Dict[str, Any],
+    hardware_class: str | None = None,
+    additional_packs: List[str] | None = None,
+) -> SOERun:
+    """
+    Run SOE evaluation (pure function, no side effects).
+    
+    Alias for evaluate_soe for consistency with Sprint 1 requirements.
+    """
+    return evaluate_soe(industry_profile, inputs, hardware_class, additional_packs)
 
 
 def evaluate_soe(
