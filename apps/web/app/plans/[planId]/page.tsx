@@ -63,11 +63,39 @@ export default function PlanDetailPage() {
     try {
       await apiClient.submitPlan(planId, "Submitted from UI");
       await fetchPlan();
+      setEditMode(false);
     } catch (err) {
       handleApiError(err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!authToken || !planId || !editedPlan) return;
+
+    setLoading(true);
+    try {
+      const edits = {
+        steps: editedPlan.steps,
+        state: editedPlan.state,
+      };
+      await apiClient.updatePlan(planId, edits);
+      await fetchPlan();
+      setEditMode(false);
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStepChange = (idx: number, field: string, value: any) => {
+    if (!editedPlan) return;
+
+    const newSteps = [...editedPlan.steps];
+    newSteps[idx] = { ...newSteps[idx], [field]: value };
+    setEditedPlan({ ...editedPlan, steps: newSteps });
   };
 
   if (loading && !plan) {
