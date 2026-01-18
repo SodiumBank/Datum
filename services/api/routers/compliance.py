@@ -1,9 +1,10 @@
-"""Compliance traceability API endpoints (Sprint 4)."""
+"""Compliance traceability API endpoints (Sprint 4-5)."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from services.api.core.deps import require_role
 from services.api.core.compliance_trace import get_plan_compliance_trace
+from services.api.core.compliance_report_renderer import generate_compliance_report
 
 router = APIRouter()
 
@@ -81,3 +82,39 @@ def get_step_compliance_endpoint(
         "step_title": step.get("title"),
         "compliance_trace": trace,
     }
+
+
+@router.post("/plans/{plan_id}/reports/generate")
+def generate_compliance_report_endpoint(
+    plan_id: str,
+    format: str = "html",
+    auth: dict = Depends(require_role("OPS", "ADMIN")),
+):
+    """
+    Generate compliance report for a plan (Sprint 5).
+    
+    Returns HTML or PDF report suitable for audit purposes.
+    Only approved plans can have reports generated.
+    """
+    try:
+        if format not in ["html", "pdf"]:
+            raise ValueError(f"Unsupported format: {format}. Use 'html' or 'pdf'")
+        
+        report = generate_compliance_report(plan_id, format=format)
+        return {
+            "plan_id": plan_id,
+            "format": format,
+            "hash": report["hash"],
+            "content": report["rendered_content"],
+            "metadata": report["metadata"],
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate compliance report: {str(e)}",
+        ) from e

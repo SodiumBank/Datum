@@ -268,9 +268,10 @@ def evaluate_soe(
     hardware_class: str | None = None,
     additional_packs: List[str] | None = None,
     active_profiles: List[str] | None = None,
+    profile_bundle_id: str | None = None,  # Sprint 5: Bundle selection
 ) -> SOERun:
     """
-    Evaluate SOE rules and generate SOERun (Sprint 4: with profile stack support).
+    Evaluate SOE rules and generate SOERun (Sprint 4-5: with profile stack and bundle support).
     
     Args:
         industry_profile: Industry profile name (space, aerospace, medical, etc.)
@@ -278,13 +279,34 @@ def evaluate_soe(
         hardware_class: Optional hardware class (flight, class_2, etc.)
         additional_packs: Optional additional packs beyond defaults
         active_profiles: Optional profile stack (Sprint 4: BASE/DOMAIN/CUSTOMER_OVERRIDE)
+        profile_bundle_id: Optional bundle ID (Sprint 5: resolves to profile list)
     
     Returns:
         SOERun object with decisions, gates, and modifiers (including profile_stack if active_profiles provided)
     """
+    # Sprint 5: Resolve bundle to profiles if provided
+    if profile_bundle_id:
+        from services.api.core.profile_bundles import resolve_bundle_profiles
+        try:
+            bundle_profiles = resolve_bundle_profiles(profile_bundle_id)
+            # Merge with active_profiles if provided
+            if active_profiles:
+                active_profiles = list(set(active_profiles + bundle_profiles))
+            else:
+                active_profiles = bundle_profiles
+        except ValueError as e:
+            print(f"Warning: Failed to resolve bundle {profile_bundle_id}: {e}")
+    
     # Resolve active packs (Sprint 4: can come from profile stack)
     profile_stack: List[Dict[str, Any]] = []
     if active_profiles:
+        # Sprint 5: Validate profiles before use (red-team guard)
+        from services.api.core.profile_lifecycle import validate_profile_for_use
+        for profile_id in active_profiles:
+            is_valid, error_msg = validate_profile_for_use(profile_id, allow_draft=False)
+            if not is_valid:
+                raise ValueError(f"Profile {profile_id} cannot be used: {error_msg}")
+        
         # Resolve profile stack
         try:
             resolved_profiles, errors = resolve_profile_stack(active_profiles)

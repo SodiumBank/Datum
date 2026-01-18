@@ -12,12 +12,13 @@ router = APIRouter()
 
 
 class EvaluateSOERequest(BaseModel):
-    """Request model for evaluating SOE (Sprint 4: supports active_profiles)."""
+    """Request model for evaluating SOE (Sprint 4-5: supports active_profiles and bundles)."""
     industry_profile: str
     hardware_class: str | None = None
     inputs: Dict[str, Any]
     additional_packs: List[str] | None = None
     active_profiles: List[str] | None = None  # Sprint 4: Profile stack (BASE/DOMAIN/CUSTOMER_OVERRIDE)
+    profile_bundle_id: str | None = None  # Sprint 5: Bundle selection (resolves to profile list)
 
 
 @router.post("/evaluate")
@@ -38,6 +39,7 @@ def evaluate_soe_endpoint(
             hardware_class=request.hardware_class,
             additional_packs=request.additional_packs,
             active_profiles=request.active_profiles,  # Sprint 4
+            profile_bundle_id=request.profile_bundle_id,  # Sprint 5
         )
         return soe_run
     except ValueError as e:
@@ -109,6 +111,7 @@ def export_audit_manifest_endpoint(
             hardware_class=request.hardware_class,
             additional_packs=request.additional_packs,
             active_profiles=request.active_profiles,  # Sprint 4
+            profile_bundle_id=request.profile_bundle_id,  # Sprint 5
         )
         
         manifest = export_audit_manifest(soe_run)
@@ -138,6 +141,7 @@ def create_decision_log_endpoint(
             hardware_class=request.hardware_class,
             additional_packs=request.additional_packs,
             active_profiles=request.active_profiles,  # Sprint 4
+            profile_bundle_id=request.profile_bundle_id,  # Sprint 5
         )
         
         decision_log = create_decision_log(soe_run)
