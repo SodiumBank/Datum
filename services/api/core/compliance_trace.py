@@ -107,16 +107,18 @@ def get_plan_compliance_trace(plan_id: str) -> Dict[str, Any]:
         if active_profiles:
             resolved_profiles, errors = resolve_profile_stack(active_profiles)
             if not errors:
-                profile_stack = [
-                    {
-                        "profile_id": p["profile_id"],
-                        "profile_type": p["profile_type"],
-                        "name": p["name"],
-                        "layer": i,
-                        "source_standards": p.get("source_standards", []),
-                    }
-                    for i, p in enumerate(resolved_profiles)
-                ]
+            # Use semantic layers (0=BASE, 1=DOMAIN, 2=CUSTOMER_OVERRIDE) not index
+            TYPE_LAYER = {"BASE": 0, "DOMAIN": 1, "CUSTOMER_OVERRIDE": 2}
+            profile_stack = [
+                {
+                    "profile_id": p["profile_id"],
+                    "profile_type": p["profile_type"],
+                    "name": p.get("name"),
+                    "layer": TYPE_LAYER.get(p.get("profile_type", ""), 0),
+                    "source_standards": p.get("source_standards", []),
+                }
+                for p in resolved_profiles
+            ]
     
     # Build traces for all steps
     step_traces: List[Dict[str, Any]] = []

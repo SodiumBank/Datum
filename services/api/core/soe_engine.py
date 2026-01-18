@@ -441,13 +441,14 @@ def evaluate_soe(
     
     # Sprint 4: Add profile stack metadata if profiles were used
     if profile_stack:
+        TYPE_LAYER = {"BASE": 0, "DOMAIN": 1, "CUSTOMER_OVERRIDE": 2}
         soe_run_base["active_profiles"] = [p["profile_id"] for p in profile_stack]
         soe_run_base["profile_stack"] = [
             {
                 "profile_id": p["profile_id"],
                 "profile_type": p["profile_type"],
                 "name": p.get("name"),
-                "layer": profile_stack.index(p),
+                "layer": TYPE_LAYER.get(p.get("profile_type", ""), 0),  # Semantic layer, not index
             }
             for p in profile_stack
         ]
