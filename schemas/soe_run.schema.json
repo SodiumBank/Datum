@@ -29,7 +29,7 @@
         "type": "object",
         "required": ["id", "object_type", "object_id", "action", "enforcement", "why"],
         "properties": {
-          "id": { "type": "string", "pattern": "^DEC-[0-9]{4}$" },
+          "id": { "type": "string", "pattern": "^DEC-[0-9A-F]{8}$" },
           "object_type": { "type": "string" },
           "object_id": { "type": "string" },
           "action": { "type": "string" },

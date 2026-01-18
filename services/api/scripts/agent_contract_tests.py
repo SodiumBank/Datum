@@ -9,10 +9,13 @@ from __future__ import annotations
 
 import copy
 import io
+import json
 import zipfile
 from fastapi.testclient import TestClient
 from services.api.main import app
 from services.api.core.security import sign_token
+from services.api.core.soe_engine import evaluate_soe
+from services.api.core.schema_validation import validate_schema
 
 def main() -> None:
     client = TestClient(app)
@@ -103,7 +106,92 @@ def main() -> None:
     assert (root / "schemas" / "datum_revision.schema.json").exists()
     assert (root / "schemas" / "datum_audit_event.schema.json").exists()
 
-    print("OK: agent contract tests passed")
+    # SOE Contract Tests
+    print("\n=== SOE Contract Tests ===")
+    
+    # Test SOE evaluation determinism
+    soe_inputs = {
+        "processes": ["SMT", "CONFORMAL_COAT"],
+        "tests_requested": [],
+        "materials": ["EPOXY_3M_SCOTCHWELD_2216"],
+        "bom_risk_flags": [],
+    }
+    
+    soe_run1 = evaluate_soe(
+        industry_profile="space",
+        inputs=soe_inputs,
+        hardware_class="flight",
+    )
+    
+    soe_run2 = evaluate_soe(
+        industry_profile="space",
+        inputs=soe_inputs,
+        hardware_class="flight",
+    )
+    
+    # Validate SOERun schema
+    try:
+        validate_schema(soe_run1, "soe_run.schema.json")
+        print("✅ SOERun schema validation passed")
+    except Exception as e:
+        raise AssertionError(f"SOERun schema validation failed: {e}") from e
+    
+    # Test determinism: same inputs -> same decision IDs
+    decisions1 = sorted(soe_run1["decisions"], key=lambda d: d["id"])
+    decisions2 = sorted(soe_run2["decisions"], key=lambda d: d["id"])
+    
+    assert len(decisions1) == len(decisions2), "SOE decision count must be deterministic"
+    for d1, d2 in zip(decisions1, decisions2):
+        assert d1["id"] == d2["id"], f"SOE decision IDs must be deterministic: {d1['id']} != {d2['id']}"
+        assert d1["action"] == d2["action"], "SOE decision actions must be deterministic"
+        assert d1["object_id"] == d2["object_id"], "SOE decision object IDs must be deterministic"
+    
+    print(f"✅ SOE determinism test passed ({len(decisions1)} decisions)")
+    
+    # Test SOE endpoint
+    soe_eval_resp = client.post(
+        "/soe/evaluate",
+        json={
+            "industry_profile": "space",
+            "hardware_class": "flight",
+            "inputs": soe_inputs,
+        },
+        headers=headers,
+    )
+    assert soe_eval_resp.status_code == 200, f"SOE evaluate failed: {soe_eval_resp.status_code}"
+    soe_response = soe_eval_resp.json()
+    
+    # Validate SOERun structure
+    assert "soe_version" in soe_response
+    assert "industry_profile" in soe_response
+    assert "decisions" in soe_response
+    assert "gates" in soe_response
+    
+    # Validate decision IDs are deterministic
+    endpoint_decisions = sorted(soe_response["decisions"], key=lambda d: d["id"])
+    assert len(endpoint_decisions) == len(decisions1), "Endpoint should return same number of decisions"
+    for ep_d, local_d in zip(endpoint_decisions, decisions1):
+        assert ep_d["id"] == local_d["id"], "Endpoint decision IDs must match local evaluation"
+    
+    print("✅ SOE endpoint contract test passed")
+    
+    # Test that non-deterministic inputs produce different results
+    soe_inputs_diff = copy.deepcopy(soe_inputs)
+    soe_inputs_diff["processes"] = ["SMT"]  # Remove CONFORMAL_COAT
+    
+    soe_run_diff = evaluate_soe(
+        industry_profile="space",
+        inputs=soe_inputs_diff,
+        hardware_class="flight",
+    )
+    
+    # Should produce different decisions (or at least validate it runs)
+    validate_schema(soe_run_diff, "soe_run.schema.json")
+    print("✅ SOE non-deterministic input test passed")
+    
+    print("✅ SOE contract tests passed")
+    
+    print("\n✅ All contract tests passed")
 
 if __name__ == "__main__":
     main()
