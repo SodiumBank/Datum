@@ -653,7 +653,7 @@ def generate_plan(
     # Create timestamp
     timestamp = datetime.now(timezone.utc).isoformat()
     
-    # Build plan payload (SPRINT 2: Immutable intent layer)
+    # Build plan payload (SPRINT 2: Immutable intent layer, SPRINT 3: Editable with constraints)
     plan: Dict[str, Any] = {
         "id": plan_id,
         "org_id": org_id,
@@ -663,6 +663,8 @@ def generate_plan(
         "quote_version": quote.get("quote_version", 1),
         "plan_revision": plan_revision,
         "locked": False,
+        "version": 1,  # Sprint 3: Start at version 1
+        "state": "draft",  # Sprint 3: Plans start in draft
         "derived_from_ruleset": {
             "ruleset_id": "ruleset_default",
             "ruleset_version": ruleset_version,

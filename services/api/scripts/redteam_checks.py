@@ -1,6 +1,7 @@
 """Red-team checks for Datum - prevent security violations and guardrail breaches.
 
 Sprint 2: Extend checks to prevent edits/overrides in Sprint 2 artifacts.
+Sprint 3: Update checks to allow overrides with justification and prevent silent overrides.
 """
 
 import json
@@ -38,9 +39,9 @@ def check_plan_mutation_endpoints() -> List[Tuple[str, bool, str]]:
     return results
 
 
-def check_no_edit_buttons_in_ui() -> List[Tuple[str, bool, str]]:
+def check_edit_ui_has_soe_locks() -> List[Tuple[str, bool, str]]:
     """
-    Check that Ops UI has no edit buttons for DatumPlan (Sprint 2).
+    Check that Ops UI edit functionality respects SOE locks (Sprint 3).
     
     Returns:
         List of (file_path, passed, error_message) tuples
@@ -49,35 +50,26 @@ def check_no_edit_buttons_in_ui() -> List[Tuple[str, bool, str]]:
     ops_ui = Path(__file__).parent.parent.parent.parent / "apps" / "ops" / "app"
     
     if not ops_ui.exists():
-        # UI might not exist yet - that's okay for Sprint 2
-        results.append(("ops/app", True, "Ops UI not yet implemented (okay for Sprint 2)"))
+        # UI might not exist yet
+        results.append(("ops/app", True, "Ops UI not yet implemented"))
         return results
     
-    # Check for edit buttons in plan viewer
-    for ui_file in ops_ui.rglob("*.tsx"):
-        content = ui_file.read_text(encoding="utf-8")
-        file_name = str(ui_file.relative_to(ops_ui))
+    # Check for edit functionality in plan viewer
+    plan_viewer = ops_ui / "plan" / "page.tsx"
+    if plan_viewer.exists():
+        content = plan_viewer.read_text(encoding="utf-8")
         
-        # Check for edit-related patterns
-        edit_patterns = [
-            r'edit.*plan',
-            r'onEdit',
-            r'handleEdit',
-            r'mutate.*plan',
-            r'update.*plan',
-        ]
-        
-        for pattern in edit_patterns:
-            if re.search(pattern, content, re.IGNORECASE):
-                # Check if it's disabled or commented
-                if "Sprint 2" in content or "read-only" in content.lower() or "disabled" in content.lower():
-                    results.append((file_name, True, f"Edit pattern found but disabled: {pattern}"))
-                else:
-                    results.append((file_name, False, f"Edit functionality found in Sprint 2 UI: {pattern}"))
-                    break
-    
-    if not results:
-        results.append(("ops/app", True, "No edit functionality found in Ops UI"))
+        # Sprint 3: Edit functionality should exist
+        if "edit" in content.lower() or "PATCH" in content:
+            # Check that SOE locks are respected
+            if "soe" in content.lower() and ("lock" in content.lower() or "read-only" in content.lower()):
+                results.append(("plan/page.tsx", True, "Edit UI respects SOE locks"))
+            else:
+                results.append(("plan/page.tsx", False, "Edit UI missing SOE lock handling"))
+        else:
+            results.append(("plan/page.tsx", True, "Edit UI not yet implemented (okay)"))
+    else:
+        results.append(("plan/page.tsx", True, "Plan viewer not yet implemented"))
     
     return results
 
@@ -141,9 +133,11 @@ def check_no_override_flags() -> List[Tuple[str, bool, str]]:
     return results
 
 
-def run_sprint2_guardrail_checks() -> bool:
+def run_sprint3_guardrail_checks() -> bool:
     """
-    Run all Sprint 2 guardrail checks.
+    Run all Sprint 3 guardrail checks.
+    
+    Sprint 3: Edits allowed but must validate SOE constraints, require reasons, and track overrides.
     
     Returns:
         True if all checks pass, False otherwise
@@ -151,7 +145,7 @@ def run_sprint2_guardrail_checks() -> bool:
     all_results = []
     
     all_results.extend(check_plan_mutation_endpoints())
-    all_results.extend(check_no_edit_buttons_in_ui())
+    all_results.extend(check_edit_ui_has_soe_locks())
     all_results.extend(check_no_override_flags())
     
     # Print results
@@ -166,12 +160,22 @@ def run_sprint2_guardrail_checks() -> bool:
             print(f"❌ {file_path}: {message}")
             failed += 1
     
-    print(f"\nSprint 2 Guardrail Checks: {passed} passed, {failed} failed")
+    print(f"\nSprint 3 Guardrail Checks: {passed} passed, {failed} failed")
     
     return failed == 0
 
 
+def run_sprint2_guardrail_checks() -> bool:
+    """
+    Run all Sprint 2 guardrail checks (deprecated, use run_sprint3_guardrail_checks).
+    
+    Returns:
+        True if all checks pass, False otherwise
+    """
+    return run_sprint3_guardrail_checks()
+
+
 if __name__ == "__main__":
     import sys
-    success = run_sprint2_guardrail_checks()
+    success = run_sprint3_guardrail_checks()
     sys.exit(0 if success else 1)
