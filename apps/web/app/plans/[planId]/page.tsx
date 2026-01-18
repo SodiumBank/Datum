@@ -252,6 +252,23 @@ export default function PlanDetailPage() {
           </div>
         </section>
       )}
+
+      {/* Navigation */}
+      <div style={{ marginTop: 32, padding: 16, backgroundColor: "#f5f5f5", borderRadius: 4 }}>
+        <a
+          href={`/plans/${planId}/compliance`}
+          style={{
+            display: "inline-block",
+            padding: "8px 16px",
+            backgroundColor: "#0070f3",
+            color: "white",
+            textDecoration: "none",
+            borderRadius: 4,
+          }}
+        >
+          View Compliance & Standards →
+        </a>
+      </div>
     </main>
   );
 }
