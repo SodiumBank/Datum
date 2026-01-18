@@ -80,32 +80,56 @@ def _generate_revision(existing_revisions: List[str]) -> str:
     return "A"
 
 
-def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
+def _ensure_step_schema_compliant(step: Dict[str, Any], ruleset_version: int = 1) -> Dict[str, Any]:
+    """
+    Ensure step is schema-compliant (Sprint 7).
+    
+    - Remove None values for parameters/acceptance (omit optional fields)
+    - Ensure source_rules has at least one entry (required: minItems: 1)
+    """
+    # Remove None values for optional object fields
+    if step.get("parameters") is None:
+        step.pop("parameters", None)
+    if step.get("acceptance") is None:
+        step.pop("acceptance", None)
+    
+    # Ensure source_rules has at least one entry (schema requires minItems: 1)
+    if not step.get("source_rules") or len(step["source_rules"]) == 0:
+        step["source_rules"] = [{
+            "rule_id": "BASELINE_DEFAULT_STEP",
+            "ruleset_version": ruleset_version,
+            "justification": "Default manufacturing step required by baseline process",
+        }]
+    
+    return step
+
+
+def _create_default_steps(quote: Dict[str, Any], ruleset_version: int = 1) -> List[PlanStep]:
     """Create default process steps for a quote (Sprint 2: canonical step types)."""
     steps: List[PlanStep] = []
     sequence = 1
     
     # PCB Fabrication
-    steps.append({
+    step = {
         "step_id": _generate_deterministic_id({"type": "FAB", "sequence": sequence, "title": "PCB Fabrication"}),
         "type": "FAB",
         "title": "PCB Fabrication",
         "sequence": sequence,
         "required": True,
         "locked_sequence": False,
-        "parameters": None,
         "acceptance": {
             "criteria": "IPC-A-600 Class 3",
             "sampling": "100_PERCENT",
         },
         "source_rules": [],
-    })
+    }
+    steps.append(_ensure_step_schema_compliant(step, ruleset_version))
     sequence += 1
     
     # Assembly
     assembly_sides = quote.get("assumptions", {}).get("assembly_sides", ["TOP"])
     if "TOP" in assembly_sides:
-        steps.append({
+        step = {
             "step_id": _generate_deterministic_id({"type": "SMT", "sequence": sequence, "title": "Top-side SMT"}),
             "type": "SMT",
             "title": "Top-side SMT",
@@ -118,10 +142,11 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
                 "sampling": "100_PERCENT",
             },
             "source_rules": [],
-        })
+        }
+        steps.append(_ensure_step_schema_compliant(step, ruleset_version))
         sequence += 1
         
-        steps.append({
+        step = {
             "step_id": _generate_deterministic_id({"type": "REFLOW", "sequence": sequence, "title": "Top-side Reflow"}),
             "type": "REFLOW",
             "title": "Top-side Reflow",
@@ -129,13 +154,13 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
             "required": True,
             "locked_sequence": False,
             "parameters": {"side": "TOP"},
-            "acceptance": None,
             "source_rules": [],
-        })
+        }
+        steps.append(_ensure_step_schema_compliant(step, ruleset_version))
         sequence += 1
     
     if "BOTTOM" in assembly_sides:
-        steps.append({
+        step = {
             "step_id": _generate_deterministic_id({"type": "SMT", "sequence": sequence, "title": "Bottom-side SMT"}),
             "type": "SMT",
             "title": "Bottom-side SMT",
@@ -148,10 +173,11 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
                 "sampling": "100_PERCENT",
             },
             "source_rules": [],
-        })
+        }
+        steps.append(_ensure_step_schema_compliant(step, ruleset_version))
         sequence += 1
         
-        steps.append({
+        step = {
             "step_id": _generate_deterministic_id({"type": "REFLOW", "sequence": sequence, "title": "Bottom-side Reflow"}),
             "type": "REFLOW",
             "title": "Bottom-side Reflow",
@@ -159,40 +185,39 @@ def _create_default_steps(quote: Dict[str, Any]) -> List[PlanStep]:
             "required": True,
             "locked_sequence": False,
             "parameters": {"side": "BOTTOM"},
-            "acceptance": None,
             "source_rules": [],
-        })
+        }
+        steps.append(_ensure_step_schema_compliant(step, ruleset_version))
         sequence += 1
     
     # Final Inspection
-    steps.append({
+    step = {
         "step_id": _generate_deterministic_id({"type": "INSPECT", "sequence": sequence, "title": "Final Inspection"}),
         "type": "INSPECT",
         "title": "Final Inspection",
         "sequence": sequence,
         "required": True,
         "locked_sequence": False,
-        "parameters": None,
         "acceptance": {
             "criteria": "Visual inspection per IPC-A-610",
             "sampling": "100_PERCENT",
         },
         "source_rules": [],
-    })
+    }
+    steps.append(_ensure_step_schema_compliant(step, ruleset_version))
     sequence += 1
     
     # Pack
-    steps.append({
+    step = {
         "step_id": _generate_deterministic_id({"type": "PACK", "sequence": sequence, "title": "Packaging"}),
         "type": "PACK",
         "title": "Packaging",
         "sequence": sequence,
         "required": True,
         "locked_sequence": False,
-        "parameters": None,
-        "acceptance": None,
         "source_rules": [],
-    })
+    }
+    steps.append(_ensure_step_schema_compliant(step, ruleset_version))
     
     return steps
 
@@ -248,18 +273,21 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                 step_title = payload.get("title", step_type.replace("_", " ").title())
                 
                 sequence_counter += 1
-                step_inputs = {"type": step_type, "sequence": sequence_counter, "title": step_title}
-                new_step: PlanStep = {
-                    "step_id": _generate_deterministic_id(step_inputs),
-                    "type": step_type,
-                    "title": step_title,
-                    "sequence": sequence_counter,
-                    "required": payload.get("required", True),
-                    "locked_sequence": payload.get("lock_sequence", False),
-                    "parameters": payload.get("parameters"),
-                    "acceptance": payload.get("acceptance"),
-                    "source_rules": [source_rule],
-                }
+            step_inputs = {"type": step_type, "sequence": sequence_counter, "title": step_title}
+            new_step: PlanStep = {
+                "step_id": _generate_deterministic_id(step_inputs),
+                "type": step_type,
+                "title": step_title,
+                "sequence": sequence_counter,
+                "required": payload.get("required", True),
+                "locked_sequence": payload.get("lock_sequence", False),
+                "source_rules": [source_rule],
+            }
+            # Add optional fields only if present
+            if payload.get("parameters"):
+                new_step["parameters"] = payload.get("parameters")
+            if payload.get("acceptance"):
+                new_step["acceptance"] = payload.get("acceptance")
                 new_steps.append(new_step)
                 
                 if payload.get("lock_sequence", False):
@@ -305,7 +333,6 @@ def _convert_rule_actions_to_steps(traces: List[RuleTrace], existing_steps: List
                             "sequence": sequence_counter,
                             "required": True,
                             "locked_sequence": lock_sequence,
-                            "parameters": None,
                             "acceptance": {
                                 "criteria": f"NASA-STD-8739.1 compliance for {step_name}",
                                 "sampling": "100_PERCENT",
@@ -600,7 +627,7 @@ def generate_plan(
     traces = evaluate_rules(context, ruleset_version=ruleset_version, tier=tier)
     
     # Create default steps
-    steps = _create_default_steps(quote)
+    steps = _create_default_steps(quote, ruleset_version=ruleset_version)
     
     # Convert rule actions to steps
     rule_steps = _convert_rule_actions_to_steps(traces, steps)
