@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datum.example/schemas/standards_profile.schema.json",
+  "title": "Standards Profile (Layered Compliance)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "profile_type",
+    "name",
+    "version"
+  ],
+  "properties": {
+    "profile_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_.-]+$",
+      "description": "Unique identifier for this profile (e.g., AS9100_BASE, NASA_POLYMERICS_ADDENDUM)"
+    },
+    "profile_type": {
+      "type": "string",
+      "enum": ["BASE", "DOMAIN", "CUSTOMER_OVERRIDE"],
+      "description": "Profile layer type: BASE (IPC/core), DOMAIN (industry-specific), CUSTOMER_OVERRIDE (program-specific)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name (e.g., 'AS9100 Base', 'NASA Polymerics Controls')"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Profile version (semver)"
+    },
+    "parent_profiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_.-]+$"
+      },
+      "description": "Profile IDs this profile inherits from (DOMAIN inherits from BASE, CUSTOMER_OVERRIDE inherits from DOMAIN)"
+    },
+    "industry_domains": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["space", "aerospace", "medical", "automotive", "industrial"]
+      },
+      "description": "Industry domains this profile applies to"
+    },
+    "source_standards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["standard_id", "clause"],
+        "properties": {
+          "standard_id": {
+            "type": "string",
+            "description": "Standard identifier (e.g., 'AS9100', 'NASA-STD-8739.1', 'ISO13485')"
+          },
+          "clause": {
+            "type": "string",
+            "description": "Clause reference (e.g., '8.5.1', '7.5.6', '4.2.3')"
+          },
+          "section": {
+            "type": "string",
+            "description": "Section title or description"
+          }
+        }
+      },
+      "description": "Source standards and clauses this profile implements"
+    },
+    "standards_packs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Standards pack IDs included in this profile"
+    },
+    "inheritance_rules": {
+      "type": "object",
+      "properties": {
+        "override_mode": {
+          "type": "string",
+          "enum": ["STRICT", "ADDITIVE", "REPLACE"],
+          "default": "ADDITIVE",
+          "description": "How this profile overrides parent profiles"
+        },
+        "conflict_resolution": {
+          "type": "string",
+          "enum": ["ERROR", "PARENT_WINS", "CHILD_WINS"],
+          "default": "ERROR",
+          "description": "How to resolve conflicts with parent profiles"
+        }
+      },
+      "description": "Rules for inheriting and overriding parent profiles"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "effective_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maintained_by": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
