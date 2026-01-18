@@ -35,7 +35,9 @@ Complete API endpoint reference for the Datum Manufacturing Decision System.
 - `POST /plans/{plan_id}/submit` - Submit plan for approval (Sprint 3)
 - `POST /plans/{plan_id}/approve` - Approve plan (Sprint 3, Ops/Admin only)
 - `POST /plans/{plan_id}/reject` - Reject plan (Sprint 3, Ops/Admin only)
-- `POST /plans/{plan_id}/export` - Export plan (Sprint 3, approved plans only)
+- `GET /plans/{plan_id}/export/csv` - Export plan to CSV (Sprint 3, approved plans only)
+- `GET /plans/{plan_id}/export/json` - Export plan to JSON (Sprint 3, approved plans only, Sprint 7: Tier 3 required for exports with execution_outputs)
+- `GET /plans/{plan_id}/export/placement-csv` - Export placement data to CSV (Sprint 3, approved plans only)
 
 ## Tests
 - `POST /tests/generate` - Generate tests from plan
@@ -56,13 +58,17 @@ Complete API endpoint reference for the Datum Manufacturing Decision System.
 - `POST /soe/decision-log` - Create decision log with deterministic IDs
 
 ## Outputs (Execution Intent)
-- `POST /outputs/{plan_id}/generate` - Generate execution outputs for plan
-- `GET /outputs/{plan_id}` - Get execution outputs
-- `POST /outputs/{plan_id}/export` - Export execution outputs (Sprint 3, approved plans only)
+- `GET /outputs/{plan_id}` - Get execution outputs for plan
+- `GET /outputs/{plan_id}/stencil` - Get stencil intent for plan
+- `GET /outputs/{plan_id}/placement` - Get placement intent for plan
+- `GET /outputs/{plan_id}/selective-solder` - Get selective solder intent for plan
+- `GET /outputs/{plan_id}/lead-form` - Get lead form intent for plan
+- `GET /outputs/{plan_id}/programming` - Get programming intent for plan
 
-## Compliance (Sprint 4-5)
+## Compliance (Sprint 4-6)
 - `GET /compliance/plans/{plan_id}/compliance-trace` - Get compliance traceability for plan
 - `GET /compliance/plans/{plan_id}/steps/{step_id}/compliance` - Get compliance trace for specific step
+- `GET /compliance/plans/{plan_id}/audit-integrity` - Check audit integrity for plan (Sprint 6)
 - `POST /compliance/plans/{plan_id}/reports/generate` - Generate compliance report (Sprint 5, approved plans only, HTML format)
 
 ## Profiles (Sprint 5) - Standards Profile Lifecycle, Versioning, and Bundles

@@ -15,8 +15,17 @@ from services.api.core.storage import get_plan, get_soe_run
 from services.api.core.execution_outputs import generate_all_execution_outputs
 
 
-def validate_plan_exportable(plan: Dict[str, Any]) -> tuple[bool, str]:
-    """Check if plan can be exported (must be approved)."""
+def validate_plan_exportable(plan: Dict[str, Any], require_tier_3: bool = False) -> tuple[bool, str]:
+    """
+    Check if plan can be exported (Sprint 7: must be approved + optionally tier gated).
+    
+    Args:
+        plan: Plan to validate
+        require_tier_3: If True, requires quote.tier >= TIER_3 (Sprint 7: tier enforcement)
+    
+    Returns:
+        (is_exportable, error_message)
+    """
     if plan.get("state") != "approved":
         return (
             False,
@@ -28,6 +37,33 @@ def validate_plan_exportable(plan: Dict[str, Any]) -> tuple[bool, str]:
             False,
             "Approved plans must be locked before export.",
         )
+    
+    # Sprint 7: Tier enforcement for Tier 3 exports
+    if require_tier_3:
+        quote_id = plan.get("quote_id")
+        if not quote_id:
+            return (
+                False,
+                "Plan missing quote_id - cannot verify tier.",
+            )
+        
+        from services.api.core.storage import get_quote
+        quote = get_quote(quote_id)
+        if not quote:
+            return (
+                False,
+                f"Quote {quote_id} not found - cannot verify tier.",
+            )
+        
+        tier = quote.get("tier", "TIER_1")
+        tier_order = {"TIER_1": 1, "TIER_2": 2, "TIER_3": 3}
+        quote_tier_order = tier_order.get(tier, 1)
+        
+        if quote_tier_order < 3:
+            return (
+                False,
+                f"Export requires Tier 3. Plan is Tier {tier}. Upgrade to Tier 3 to export.",
+            )
     
     return (True, "")
 
@@ -81,18 +117,19 @@ def export_plan_to_csv(plan: Dict[str, Any]) -> str:
     return output.getvalue()
 
 
-def export_plan_to_json(plan: Dict[str, Any], include_execution_outputs: bool = False) -> Dict[str, Any]:
+def export_plan_to_json(plan: Dict[str, Any], include_execution_outputs: bool = False, require_tier_3: bool = False) -> Dict[str, Any]:
     """
-    Export plan to JSON format (Sprint 3: production-ready, Sprint 5: hardened).
+    Export plan to JSON format (Sprint 3: production-ready, Sprint 5: hardened, Sprint 7: tier-gated).
     
     Args:
         plan: Plan to export
         include_execution_outputs: Whether to include execution outputs
+        require_tier_3: If True, requires Tier 3 (Sprint 7: tier enforcement)
     
     Returns:
         JSON-serializable dict with provenance metadata and hash
     """
-    is_exportable, error_msg = validate_plan_exportable(plan)
+    is_exportable, error_msg = validate_plan_exportable(plan, require_tier_3=require_tier_3)
     if not is_exportable:
         raise ValueError(error_msg)
     

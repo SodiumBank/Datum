@@ -505,8 +505,14 @@ def export_plan_json_endpoint(
     include_execution_outputs: bool = False,
     auth: dict = Depends(require_role("OPS", "ADMIN")),
 ):
-    """Export plan to JSON (Sprint 3: only approved plans)."""
+    """
+    Export plan to JSON (Sprint 3: approved plans only, Sprint 7: Tier 3 required if include_execution_outputs=True).
+    
+    If include_execution_outputs=True, requires quote.tier >= TIER_3 per Sprint 7 tier enforcement.
+    """
     from services.api.core.plan_exporter import export_plan_to_json
+    from services.api.core.storage import save_audit_event
+    from datetime import datetime, timezone
     import json
     
     plan = get_plan(plan_id)
@@ -517,7 +523,24 @@ def export_plan_json_endpoint(
         )
     
     try:
-        export_data = export_plan_to_json(plan, include_execution_outputs=include_execution_outputs)
+        # Sprint 7: Tier 3 enforcement for exports with execution outputs
+        require_tier_3 = include_execution_outputs
+        export_data = export_plan_to_json(plan, include_execution_outputs=include_execution_outputs, require_tier_3=require_tier_3)
+        
+        # Sprint 7: Audit event for export (allowed or denied)
+        user_id = auth.get("user_id", "system")
+        timestamp = datetime.now(timezone.utc).isoformat()
+        audit_event = {
+            "id": f"audit_export_{plan_id}_{timestamp}",
+            "entity_type": "DATUM_PLAN",
+            "entity_id": plan_id,
+            "action": "EXPORT",
+            "user_id": user_id,
+            "timestamp": timestamp,
+            "reason": f"Plan exported to JSON (execution_outputs={include_execution_outputs}, tier_3_required={require_tier_3})",
+        }
+        save_audit_event(audit_event)
+        
         return export_data
     except ValueError as e:
         raise HTTPException(
