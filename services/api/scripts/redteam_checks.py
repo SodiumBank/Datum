@@ -107,12 +107,29 @@ def check_no_override_flags() -> List[Tuple[str, bool, str]]:
         relative_path = str(file_path.relative_to(api_dir))
         
         for pattern in override_patterns:
-            if re.search(pattern, content, re.IGNORECASE):
-                # Check if it's Sprint 3+ or disabled
-                if "Sprint 3" in content or "Sprint 2: NOT ALLOWED" in content or "disabled" in content.lower():
-                    continue
-                else:
-                    results.append((relative_path, False, f"Override pattern found: {pattern}"))
+            matches = list(re.finditer(pattern, content, re.IGNORECASE))
+            if matches:
+                # Check each match to see if it's in a comment/docstring explaining what's NOT allowed
+                for match in matches:
+                    line_start = content.rfind("\n", 0, match.start())
+                    line_end = content.find("\n", match.end())
+                    line = content[max(0, line_start):line_end] if line_end != -1 else content[line_start:]
+                    
+                    # Skip if it's in a comment, docstring, or explaining Sprint 2 restrictions
+                    if (
+                        line.strip().startswith("#")
+                        or '"""' in line
+                        or "Sprint 2" in line
+                        or "NOT ALLOWED" in line
+                        or "disabled" in line.lower()
+                        or "immutable" in line.lower()
+                        or "read-only" in line.lower()
+                    ):
+                        continue
+                    else:
+                        results.append((relative_path, False, f"Override pattern found: {pattern}"))
+                        break
+                if results and results[-1][1] is False:
                     break
     
     if not results:
