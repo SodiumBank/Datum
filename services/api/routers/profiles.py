@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
+from typing import Any, Dict
 
 from services.api.core.deps import require_role
 from services.api.core.profile_lifecycle import (

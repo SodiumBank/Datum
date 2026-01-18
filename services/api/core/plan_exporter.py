@@ -96,7 +96,7 @@ def export_plan_to_json(plan: Dict[str, Any], include_execution_outputs: bool = 
     if not is_exportable:
         raise ValueError(error_msg)
     
-    # Get SOERun for profile stack
+    # Get SOERun for profile stack (Sprint 5: provenance metadata)
     profile_stack_metadata = None
     soe_run_id = plan.get("soe_run_id")
     if soe_run_id:
